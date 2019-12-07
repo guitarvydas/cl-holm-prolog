@@ -1,3 +1,5 @@
+(in-package :cl-holm-prolog)
+
 (defconstant +true+ t)
 (defconstant +false+ nil)
 (defparameter *db* nil)
@@ -223,7 +225,11 @@
 (defun test1 ()
 ; recursive PROVE
   (setf *db* db1)
-  (prove3 goals1 empty 1)
+  (prove3 goals1 empty 1))
+
+(defun test1a ()
+; recursive PROVE
+  (setf *db* db1)
 ; 6-slide PROVE
   (prove5 '() goals1 db1 empty 1))
 
@@ -258,4 +264,9 @@
 ;; pt - should result in 9 answers, where sometimes X == Y
   (setf *db* db2)
   (prove6 '() goals3 db2 empty 1 '()))
+
+(defun test4 ()
+  (setf *db* db1)
+  (prove6 '() goals1 db1 empty 1 '()))
+
 
