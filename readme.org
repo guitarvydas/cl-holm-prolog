@@ -1,3 +1,8 @@
 * status
 ** created hprolog.lisp as working/production version
 
+* usage
+** (ql:quickload :cl-holm-prolog)
+** (in-package :hprolog)
+** (test2)
+** (test4)
