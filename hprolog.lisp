@@ -35,13 +35,7 @@
           (pair? r))
       (prove6 l g (cdr r) e n c))
     ((pair? l)
-      (prove6 (L_l l)
-              (L_g l)
-              (cdr (L_r l))
-              (L_e l)
-              (L_n l)
-              (L_c l)))))
-
+      (prove6 (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l)))))
 
 (defun prove6 (l g r e n c)
   (cond
