@@ -123,7 +123,7 @@
 
 ;(define var '?)
 (defun name (x) (cadr x))
-(defun time (x) (cddr x))
+(defun htime (x) (cddr x))
 
 (defun var? (x)
   (and (pair? x)
@@ -131,12 +131,12 @@
 
 (defun lookup (v e)
   (let ((id (name v))
-        (tm  (time v)))
+        (tm  (htime v)))
     (labels ((tail-rec-loop (e) ;; Let Over Lambda shows how to do this in CL, with actual tail recursion
              (cond ((not (pair? (caar e)))
                     +false+)
                    ((and (eq? id (name (caar e)))
-                         (eqv? tm (time (caar e))))
+                         (eqv? tm (htime (caar e))))
                     (car e))
                    (t
                     (tail-rec-loop (cdr e))))))
