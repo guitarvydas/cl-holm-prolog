@@ -4,6 +4,7 @@
    Stack overflow (stack size 15998).
     1 (continue) Extend stack by 50%.
     2 (abort) Return to top loop level 0.
+*** back6 and prove6 need to be mutually tail recursive
    
 * usage
 ** (ql:quickload :cl-holm-prolog)
