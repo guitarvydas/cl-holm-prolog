@@ -14,61 +14,12 @@
 (defun display (x) (format *standard-output* "~A" x))
 
 
-(defun try (g r e n)
-  (if (null? r)
-      +false+
-      (let* ((a  (copy (car r) (list n)))
-             (ne (unify (car g) (car a) e)))
-        (if ne
-            (prove3 (append (cdr a) (cdr g)) ne (+ 1 n)))
-        (try g (cdr r) e n))))
-
-(defun prove3 (g e n)
-  (cond ((null? g)
-          (print-frame e))
-        (t
-         (try g *db* e n))))
-
-
 (defmacro link (&rest x) `(list ,@x))
 (defmacro L_l (x) `(car ,x))
 (defmacro L_g (x) `(cadr ,x))
 (defmacro L_r (x) `(caddr ,x))
 (defmacro L_e (x) `(cadddr ,x))
 (defmacro L_n (x) `(car (cddddr ,x)))
-
-
-(defun back5 (l g r e n)
-  (if (and (pair? g)
-           (pair? r))
-      (prove5 l g (cdr r) e n)
-      (prove5 (L_l l)
-              (L_g l)
-              (cdr (L_r l))
-              (L_e l)
-              (L_n l))))
-
-
-(defun prove5 (l g r e n)
-  (cond
-    ((null? g)
-      (print-frame e)
-      (back5 l g r e n))
-    ((null? r)
-      (if (null? l)
-          +true+
-          (back5 l g r e n)))
-    (t
-      (let* ((a  (copy (car r) n))
-             (e* (unify (car a) (car g) e)))
-        (if e*
-            (prove5 (link l g r e n)
-                    (append (cdr a) (cdr g))
-                    *db*
-                    e*
-                    (+ 1 n))
-            (back5 l g r e n))))))
-
 
 (defun L_c (x) (cadr (cddddr x)))
 
@@ -191,7 +142,7 @@
   (newline)
   (labels ((tail-rec-loop (ee)
              (cond ((pair? (cdr ee))
-                    (cond ((null? (time (caar ee)))
+                    (cond ((null? (htime (caar ee)))
                            (display (cadaar ee))
                            (display " = ")
                            (display (resolve (caar ee) e))
