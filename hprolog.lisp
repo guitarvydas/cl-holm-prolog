@@ -70,7 +70,7 @@
             (back6 l g r e n c))))))
 
 
-(defconstant empty '((bottom)))
+(defconstant hempty '((bottom)))
 
 ;(define var '?)
 (defun name (x) (cadr x))
@@ -231,7 +231,7 @@
 ; 9-slide PROVE
 ;; pt - should result in 6 answers, where X != Y
   (setf *db* db2)
-  (prove6 '() goals2 db2 empty 1 '()))
+  (prove6 '() goals2 db2 hempty 1 '()))
 
 (defparameter goals3 '((some (? X))
                         (some (? Y))))
@@ -239,10 +239,10 @@
 (defun test3 ()
 ;; pt - should result in 9 answers, where sometimes X == Y
   (setf *db* db2)
-  (prove6 '() goals3 db2 empty 1 '()))
+  (prove6 '() goals3 db2 hempty 1 '()))
 
 (defun test4 ()
   (setf *db* db1)
-  (prove6 '() goals1 db1 empty 1 '()))
+  (prove6 '() goals1 db1 hempty 1 '()))
 
 
