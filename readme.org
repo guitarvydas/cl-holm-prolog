@@ -11,3 +11,7 @@
 ** (in-package :hprolog)
 ** (test2)
 ** (test4)
+
+* todo
+** rewrite prove6 + back6 for use in looping languages
+
