@@ -173,17 +173,6 @@
 
 (defparameter goals1 '((path a f (? P))))
 
-(defun test1 ()
-; recursive PROVE
-  (setf *db* db1)
-  (prove3 goals1 empty 1))
-
-(defun test1a ()
-; recursive PROVE
-  (setf *db* db1)
-; 6-slide PROVE
-  (prove5 '() goals1 db1 empty 1))
-
 ;; Negation as failure
 
 (defparameter db2
