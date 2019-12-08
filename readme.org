@@ -1,6 +1,10 @@
 * status
 ** created hprolog.lisp as working/production version
-
+** working on stack overflow (test2) then (test4) under LWW
+   Stack overflow (stack size 15998).
+    1 (continue) Extend stack by 50%.
+    2 (abort) Return to top loop level 0.
+   
 * usage
 ** (ql:quickload :cl-holm-prolog)
 ** (in-package :hprolog)
