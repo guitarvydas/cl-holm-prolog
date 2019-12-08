@@ -1,4 +1,5 @@
 (defsystem "cl-holm-prolog"
+  :depends-on (loops)
   :around-compile (lambda (next)
                     (proclaim '(optimize (debug 3)
                                          (safety 3)
