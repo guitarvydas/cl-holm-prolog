@@ -5,7 +5,7 @@
 (defparameter *db* nil)
 
 (defun null? (x) (null x))
-(defun pair? (x) (consp x))
+(defun pair? (x) (and (not (null x)) (listp x)))
 (defun eq? (x y) (eq x y))
 (defun eqv? (x y) (eql x y))
 
@@ -80,18 +80,32 @@
   (and (pair? x)
        (eq? '? (car x))))
 
-(defun lookup (v e)
+;; (defun lookup (v e)
+;;   (let ((id (name v))
+;;         (tm  (htime v)))
+;;     (labels ((tail-rec-loop (e) ;; Let Over Lambda shows how to do this in CL, with actual tail recursion
+;;              (cond ((not (pair? (caar e)))
+;;                     +false+)
+;;                    ((and (eq? id (name (caar e)))
+;;                          (eqv? tm (htime (caar e))))
+;;                     (car e))
+;;                    (t
+;;                     (tail-rec-loop (cdr e))))))
+;;       (tail-rec-loop e))))
+
+(defun lookup (v orig-e)
   (let ((id (name v))
         (tm  (htime v)))
-    (labels ((tail-rec-loop (e) ;; Let Over Lambda shows how to do this in CL, with actual tail recursion
-             (cond ((not (pair? (caar e)))
-                    +false+)
-                   ((and (eq? id (name (caar e)))
-                         (eqv? tm (htime (caar e))))
-                    (car e))
-                   (t
-                    (tail-rec-loop (cdr e))))))
-      (tail-rec-loop e))))
+    (labels ((tail-rec-loop (ee) ;; Let Over Lambda shows how to do this in CL, with actual tail recursion
+	       (loop for e = ee then (cdr e)
+		    do
+		    (cond ((not (pair? (caar e)))
+			   (return-from tail-rec-loop +false+))
+			  ((and (eq? id (name (caar e)))
+				(eqv? tm (htime (caar e))))
+			   (return-from tail-rec-loop (car e)))
+			  (t nil)))))
+      (tail-rec-loop orig-e))))
 
 (defun value (x e)
   (if (var? x)
@@ -138,6 +152,17 @@
             (resolve (car x) e)
             (resolve (cdr x) e)))))
 
+;;; (define (print-frame e)
+;;;   (newline)
+;;;   (let loop ((ee e))
+;;;     (cond ((pair? (cdr ee))
+;;;             (cond ((null? (time (caar ee)))
+;;;                     (display (cadaar ee))
+;;;                     (display " = ")
+;;;                     (display (resolve (caar ee) e))
+;;;                     (newline)))
+;;;             (loop (cdr ee))))))
+
 (defun print-frame (e)
   (newline)
   (labels ((tail-rec-loop (ee)
@@ -150,6 +175,17 @@
                     (tail-rec-loop (cdr ee))))))
     (tail-rec-loop e)))
 
+;;; (defun print-frame (e)
+;;;   (newline)
+;;;   (loop for ee = e then (cdr ee)
+;;;         do
+;;;         (cond ((pair? (cdr ee))
+;;;                (cond ((null? (htime (caar ee)))
+;;;                       (display (cadaar ee))
+;;;                       (display " = ")
+;;;                       (display (resolve (caar ee) e))
+;;;                       (newline))))
+;;;               (t (loop-finish)))))
 
 ;; Graph example from section 1
 (defparameter db1 '(((edge a b))
