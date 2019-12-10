@@ -29,39 +29,39 @@
   ;(set-car! (cddr x) '(())))
 
 
-(defun back6 (l g r e n c)
+(defun back7 (l g r e n c results-accumulator)
   (cond
    ((and (pair? g)
          (pair? r))
-    (prove6 l g (cdr r) e n c))
+    (prove7 l g (cdr r) e n c results-accumulator))
    ((pair? l)
-    (prove6 (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l)))))
+    (prove7 (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l) results-accumulator))))
 
-(defun prove6 (l g r e n c)
+(defun prove7 (l g r e n c results-accumulator)
   (cond
    ((null? g)
-    (print-frame e)
-    (back6 l g r e n c))
+    (back7 l g r e n c (cons (collect-frame e) results-accumulator)))
    ((eq? :! (car g))
     (clear_r c)
-    (prove6 c (cdr g) r e n c))
+    (prove7 c (cdr g) r e n c results-accumulator))
    ((eq? :r! (car g))
-    (prove6 l (cddr g) r e n (cadr g)))
+    (prove7 l (cddr g) r e n (cadr g) results-accumulator))
    ((null? r)
     (if (null? l)
-        +true+
-      (back6 l g r e n c)))
+        results-accumulator
+      (back7 l g r e n c results-accumulator)))
    (t
     (let* ((a  (copy (car r) n))
            (e* (unify (car a) (car g) e)))
       (if e*
-          (prove6 (link l g r e n c)
+          (prove7 (link l g r e n c)
                   (append (cdr a) `(:r! ,l) (cdr g))
                   *db*
                   e*
                   (+ 1 n)
-                  l)
-        (back6 l g r e n c))))))
+                  l
+                  results-accumulator)
+        (back7 l g r e n c results-accumulator))))))
 
 
 (defparameter empty '((bottom)))
@@ -157,29 +157,19 @@
 ;;;                     (newline)))
 ;;;             (loop (cdr ee))))))
 
-(defun print-frame (e)
-  (newline)
-  (labels ((tail-rec-loop (ee)
-             (cond ((pair? (cdr ee))
-                    (cond ((null? (htime (caar ee)))
-                           (display (cadaar ee))
-                           (display " = ")
-                           (display (resolve (caar ee) e))
-                           (newline)))
-                    (tail-rec-loop (cdr ee))))))
-    (tail-rec-loop e)))
+(defun collect-frame (e)
+  (let ((result nil))
+    (labels ((tail-rec-loop (ee)
+               (cond ((pair? (cdr ee))
+                      (cond ((null? (htime (caar ee)))
+                             (push
+                              (cons (cadaar ee) (resolve (caar ee) e))
+                              result))
+                            (t (tail-rec-loop (cdr ee))))))))
+      (tail-rec-loop e)
+      result)))
+    
 
-;;; (defun print-frame (e)
-;;;   (newline)
-;;;   (loop for ee = e then (cdr ee)
-;;;         do
-;;;         (cond ((pair? (cdr ee))
-;;;                (cond ((null? (htime (caar ee)))
-;;;                       (display (cadaar ee))
-;;;                       (display " = ")
-;;;                       (display (resolve (caar ee) e))
-;;;                       (newline))))
-;;;               (t (loop-finish)))))
 
 ;; Graph example from section 1
 (defparameter db1 '(((edge a b))
@@ -225,7 +215,7 @@
 ; 9-slide PROVE
   ;; pt - should result in 6 answers, where X != Y
   (setf *db* db2)
-  (prove6 '() goals2 db2 empty 1 '()))
+  (prove7 '() goals2 db2 empty 1 '() nil))
 
 (defparameter goals3 '((some (:? X))
                        (some (:? Y))))
@@ -233,10 +223,10 @@
 (defun test3 ()
   ;; pt - should result in 9 answers, where sometimes X == Y
   (setf *db* db2)
-  (prove6 '() goals3 db2 empty 1 '()))
+  (prove7 '() goals3 db2 empty 1 '() nil))
 
 (defun test4 ()
   (setf *db* db1)
-  (prove6 '() goals1 db1 empty 1 '()))
+  (prove7 '() goals1 db1 empty 1 '() nil))
 
 
