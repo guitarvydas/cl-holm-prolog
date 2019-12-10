@@ -5,7 +5,7 @@
 (defparameter *db* nil)
 
 (defun null? (x) (null x))
-(defun pair? (x) (and (not (null x)) (listp x)))
+(defun pair? (x) (and (not (null x)) (or (listp x) (consp x)))
 (defun eq? (x y) (eq x y))
 (defun eqv? (x y) (eql x y))
 
@@ -31,37 +31,37 @@
 
 (defun back6 (l g r e n c)
   (cond
-    ((and (pair? g)
-          (pair? r))
-      (prove6 l g (cdr r) e n c))
-    ((pair? l)
-      (prove6 (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l)))))
+   ((and (pair? g)
+         (pair? r))
+    (prove6 l g (cdr r) e n c))
+   ((pair? l)
+    (prove6 (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l)))))
 
 (defun prove6 (l g r e n c)
   (cond
-    ((null? g)
-      (print-frame e)
-      (back6 l g r e n c))
-    ((eq? :! (car g))
-      (clear_r c)
-      (prove6 c (cdr g) r e n c))
-    ((eq? :r! (car g))
-      (prove6 l (cddr g) r e n (cadr g)))
-    ((null? r)
-      (if (null? l)
-          +true+
-          (back6 l g r e n c)))
-    (t
-      (let* ((a  (copy (car r) n))
-             (e* (unify (car a) (car g) e)))
-        (if e*
-            (prove6 (link l g r e n c)
-                    (append (cdr a) `(:r! ,l) (cdr g))
-                    *db*
-                    e*
-                    (+ 1 n)
-                    l)
-            (back6 l g r e n c))))))
+   ((null? g)
+    (print-frame e)
+    (back6 l g r e n c))
+   ((eq? :! (car g))
+    (clear_r c)
+    (prove6 c (cdr g) r e n c))
+   ((eq? :r! (car g))
+    (prove6 l (cddr g) r e n (cadr g)))
+   ((null? r)
+    (if (null? l)
+        +true+
+      (back6 l g r e n c)))
+   (t
+    (let* ((a  (copy (car r) n))
+           (e* (unify (car a) (car g) e)))
+      (if e*
+          (prove6 (link l g r e n c)
+                  (append (cdr a) `(:r! ,l) (cdr g))
+                  *db*
+                  e*
+                  (+ 1 n)
+                  l)
+        (back6 l g r e n c))))))
 
 
 (defparameter empty '((bottom)))
@@ -106,16 +106,16 @@
       (let ((v (lookup x e)))
         (if v
             (value (cadr v) e)
-            x))
-      x))
+          x))
+    x))
 
 (defun copy (x n)
   (cond
-    ((not (pair? x)) x)
+   ((not (pair? x)) x)
    ((var? x) (append x n))
-    (t
-      (cons (copy (car x) n)
-            (copy (cdr x) n)))))
+   (t
+    (cons (copy (car x) n)
+          (copy (cdr x) n)))))
 
 (defun bind (x y e)
   (cons (list x y) e))
@@ -124,27 +124,27 @@
   (let ((x (value x e))
         (y (value y e)))
     (cond
-      ((eq? x y) e)
-      ((var? x) (bind x y e))
-      ((var? y) (bind y x e))
-      ((or (not (pair? x))
-           (not (pair? y))) +false+)
-      (t
-        (let ((e* (unify (car x) (car y) e)))
-          (and e* (unify (cdr x) (cdr y) e*)))))))
+     ((eq? x y) e)
+     ((var? x) (bind x y e))
+     ((var? y) (bind y x e))
+     ((or (not (pair? x))
+          (not (pair? y))) +false+)
+     (t
+      (let ((e* (unify (car x) (car y) e)))
+        (and e* (unify (cdr x) (cdr y) e*)))))))
 
 
 (defun resolve (x e)
   (cond ((not (pair? x)) x)
         ((var? x)
-          (let ((v (value x e)))
-            (if (var? v)
-                v
-                (resolve v e))))
+         (let ((v (value x e)))
+           (if (var? v)
+               v
+             (resolve v e))))
         (t
-          (cons
-            (resolve (car x) e)
-            (resolve (cdr x) e)))))
+         (cons
+          (resolve (car x) e)
+          (resolve (cdr x) e)))))
 
 ;;; (define (print-frame e)
 ;;;   (newline)
@@ -218,20 +218,20 @@
     ((neq (:? X) (:? Y)))))
 
 (defparameter goals2 '((some (:? X))
-                        (some (:? Y))
-                        (neq (:? X) (:? Y))))
+                       (some (:? Y))
+                       (neq (:? X) (:? Y))))
 
 (defun test2 ()
 ; 9-slide PROVE
-;; pt - should result in 6 answers, where X != Y
+  ;; pt - should result in 6 answers, where X != Y
   (setf *db* db2)
   (prove6 '() goals2 db2 empty 1 '()))
 
 (defparameter goals3 '((some (:? X))
-                        (some (:? Y))))
+                       (some (:? Y))))
 
 (defun test3 ()
-;; pt - should result in 9 answers, where sometimes X == Y
+  ;; pt - should result in 9 answers, where sometimes X == Y
   (setf *db* db2)
   (prove6 '() goals3 db2 empty 1 '()))
 
