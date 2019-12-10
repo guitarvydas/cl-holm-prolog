@@ -5,7 +5,7 @@
 (defparameter *db* nil)
 
 (defun null? (x) (null x))
-(defun pair? (x) (and (not (null x)) (or (listp x) (consp x)))
+(defun pair? (x) (and (not (null x)) (or (listp x) (consp x))))
 (defun eq? (x y) (eq x y))
 (defun eqv? (x y) (eql x y))
 
