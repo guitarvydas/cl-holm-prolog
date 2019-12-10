@@ -42,10 +42,10 @@
     ((null? g)
       (print-frame e)
       (back6 l g r e n c))
-    ((eq? '! (car g))
+    ((eq? :! (car g))
       (clear_r c)
       (prove6 c (cdr g) r e n c))
-    ((eq? 'r! (car g))
+    ((eq? :r! (car g))
       (prove6 l (cddr g) r e n (cadr g)))
     ((null? r)
       (if (null? l)
@@ -56,7 +56,7 @@
              (e* (unify (car a) (car g) e)))
         (if e*
             (prove6 (link l g r e n c)
-                    (append (cdr a) `(r! ,l) (cdr g))
+                    (append (cdr a) `(:r! ,l) (cdr g))
                     *db*
                     e*
                     (+ 1 n)
@@ -72,7 +72,7 @@
 
 (defun var? (x)
   (and (pair? x)
-       (eq? '? (car x))))
+       (eq? :? (car x))))
 
 ;; (defun lookup (v e)
 ;;   (let ((id (name v))
@@ -194,14 +194,14 @@
                    ((edge h e))
                    ((edge h f))
                    
-                   ((path (? A) (? B) ((? A) (? B)))
-                    (edge (? A) (? B)))
+                   ((path (:? A) (;? B) ((:? A) (:? B)))
+                    (edge (:? A) (:? B)))
                    
-                   ((path (? A) (? B) ((? A) . (? CB)))
-                    (edge (? A) (? C))
-                    (path (? C) (? B) (? CB)))))
+                   ((path (:? A) (:? B) ((:? A) . (:? CB)))
+                    (edge (:? A) (:? C))
+                    (path (:? C) (:? B) (:? CB)))))
 
-(defparameter goals1 '((path a f (? P))))
+(defparameter goals1 '((path a f (:? P))))
 
 ;; Negation as failure
 
@@ -210,16 +210,16 @@
     ((some bar))
     ((some baz))
 
-    ((eq (? X) (? X)))
+    ((eq (:? X) (:? X)))
 
-    ((neq (? X) (? Y))
-     (eq (? X) (? Y)) ! fail)
+    ((neq (:? X) (:? Y))
+     (eq (:? X) (:? Y)) :! fail)
 
-    ((neq (? X) (? Y)))))
+    ((neq (:? X) (:? Y)))))
 
-(defparameter goals2 '((some (? X))
-                        (some (? Y))
-                        (neq (? X) (? Y))))
+(defparameter goals2 '((some (:? X))
+                        (some (:? Y))
+                        (neq (:? X) (:? Y))))
 
 (defun test2 ()
 ; 9-slide PROVE
@@ -227,8 +227,8 @@
   (setf *db* db2)
   (prove6 '() goals2 db2 empty 1 '()))
 
-(defparameter goals3 '((some (? X))
-                        (some (? Y))))
+(defparameter goals3 '((some (:? X))
+                        (some (:? Y))))
 
 (defun test3 ()
 ;; pt - should result in 9 answers, where sometimes X == Y
