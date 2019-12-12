@@ -17,13 +17,14 @@
   (set-car! (cddr x) '(())))
 
 
-(define (back8 complete-db  l g r e n c)
+(define (back8 results-accum complete-db l g r e n c)
   (cond
     ((and (pair? g)
           (pair? r))
-      (prove8 complete-db l g (cdr r) e n c))
+      (prove8 results-accum  complete-db l g (cdr r) e n c))
     ((pair? l)
-      (prove8 complete-db
+     (prove8 results-accum
+	     complete-db
               (L_l l)
               (L_g l)
               (cdr (L_r l))
@@ -32,31 +33,33 @@
               (L_c l)))))
 
 
-(define (prove8 complete-db l g r e n c)
+(define (prove8 results-accum complete-db l g r e n c)
   (cond
     ((null? g)
       (print-frame e)
-      (back8 complete-db l g r e n c))
+      (back8 results-accum complete-db l g r e n c))
     ((eq? '! (car g))
       (clear_r c)
-      (prove8 complete-db c (cdr g) r e n c))
+      (prove8 results-accum complete-db c (cdr g) r e n c))
     ((eq? 'r! (car g))
-      (prove8 complete-db l (cddr g) r e n (cadr g)))
+      (prove8 results-accum complete-db l (cddr g) r e n (cadr g)))
     ((null? r)
       (if (null? l)
           #t
-          (back8 complete-db l g r e n c)))
+          (back8 results-accum complete-db l g r e n c)))
     (else
       (let* ((a  (copy (car r) n))
              (e* (unify (car a) (car g) e)))
         (if e*
-            (prove8 complete-db (link l g r e n c)
+            (prove8 results-accum
+		    complete-db 
+		    (link l g r e n c)
                     (append (cdr a) `(r! ,l) (cdr g))
                     db
                     e*
                     (+ 1 n)
                     l)
-            (back8 complete-db l g r e n c))))))
+            (back8 results-accum complete-db l g r e n c))))))
 
 
 (define empty '((bottom)))
@@ -415,4 +418,4 @@
   '((ellipse (? eid))))
                     
   
-(define (test g) (prove8 db '() g db empty 1 '()))
+(define (test g) (prove8 '() db '() g db empty 1 '()))
