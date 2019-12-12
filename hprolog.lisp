@@ -30,6 +30,7 @@
 
 
 (defun back7 (l g r e n c results-accumulator)
+  (push `(back7 ,l ,g ,r ,e ,n ,c ,results-accumulator) cl-user::*dump*)
   (cond
    ((and (pair? g)
          (pair? r))
@@ -38,6 +39,7 @@
     (prove7 (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l) results-accumulator))))
 
 (defun prove7 (l g r e n c results-accumulator)
+  (push `(prove7 ,l ,g ,r ,e ,n ,c ,results-accumulator) cl-user::*dump*)
   (cond
    ((null? g)
     (back7 l g r e n c (cons (collect-frame e) results-accumulator)))
@@ -121,6 +123,7 @@
   (cons (list x y) e))
 
 (defun unify (x y e)
+  (push (list 'unify x y e) cl-user::*dump*)
   (let ((x (value x e))
         (y (value y e)))
     (cond
