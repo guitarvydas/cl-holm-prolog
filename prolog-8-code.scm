@@ -16,50 +16,67 @@
 (define (clear_r x)
   (set-car! (cddr x) '(())))
 
+(define (show8 rule l g r e n c results-accum complete-db success)
+  ;(display rule)
+  ;(display l)
+  ;(display g)
+  ;(display r)
+  ;(display e)
+  ;(display n)
+  ;l(display c)
+  ;(display results-accum)
+  ;(display success)
+  ;(newline)
+  ;(newline)
+  #t
+  )
 
-(define (back8 results-accum complete-db l g r e n c)
+
+(define (back l g r e n c results-accum complete-db success)
+  (show8 'back l g r e n c results-accum complete-db success)
   (cond
     ((and (pair? g)
           (pair? r))
-      (prove8 results-accum  complete-db l g (cdr r) e n c))
+      (prove l g (cdr r) e n c results-accum complete-db success))
     ((pair? l)
-     (prove8 results-accum
-	     complete-db
-              (L_l l)
+     (prove  (L_l l)
               (L_g l)
               (cdr (L_r l))
               (L_e l)
               (L_n l)
-              (L_c l)))))
+              (L_c l)
+              results-accum
+              complete-db
+              success))))
 
-
-(define (prove8 results-accum complete-db l g r e n c)
+(define (prove l g r e n c results-accum complete-db success)
+  (show8 'prove l g r e n c results-accum complete-db success)
   (cond
     ((null? g)
-      (print-frame e)
-      (back8 results-accum complete-db l g r e n c))
+      (back l g r e n c (cons (collect-results e)results-accum) complete-db 'yes))
     ((eq? '! (car g))
       (clear_r c)
-      (prove8 results-accum complete-db c (cdr g) r e n c))
+      (prove c (cdr g) r e n c results-accum complete-db success))
     ((eq? 'r! (car g))
-      (prove8 results-accum complete-db l (cddr g) r e n (cadr g)))
+      (prove l (cddr g) r e n (cadr g) results-accum complete-db success))
     ((null? r)
       (if (null? l)
-          #t
-          (back8 results-accum complete-db l g r e n c)))
+          results-accum
+          (back l g r e n c results-accum complete-db success)))
     (else
       (let* ((a  (copy (car r) n))
              (e* (unify (car a) (car g) e)))
         (if e*
-            (prove8 results-accum
-		    complete-db 
-		    (link l g r e n c)
-                    (append (cdr a) `(r! ,l) (cdr g))
-                    db
-                    e*
-                    (+ 1 n)
-                    l)
-            (back8 results-accum complete-db l g r e n c))))))
+            (prove (link l g r e n c)
+                   (append (cdr a) `(r! ,l) (cdr g))
+                   db
+                   e*
+                   (+ 1 n)
+                   l
+                   results-accum
+                   complete-db
+                   'yes)
+            (back l g r e n c results-accum complete-db success))))))
 
 
 (define empty '((bottom)))
@@ -129,18 +146,26 @@
             (resolve (car x) e)
             (resolve (cdr x) e)))))
 
-(define (print-frame e)
-  (newline)
+;; (define (print-frame e)
+;;   (newline)
+;;   (let loop ((ee e))
+;;     (cond ((pair? (cdr ee))
+;;             (cond ((null? (time (caar ee)))
+;;                     (display (cadaar ee))
+;;                     (display " = ")
+;;                     (display (resolve (caar ee) e))
+;;                     (newline)))
+;;             (loop (cdr ee))))))
+(define (collect-results e)
   (let loop ((ee e))
     (cond ((pair? (cdr ee))
-            (cond ((null? (time (caar ee)))
-                    (display (cadaar ee))
-                    (display " = ")
-                    (display (resolve (caar ee) e))
-                    (newline)))
-            (loop (cdr ee))))))
+           (cond ((null? (time (caar ee)))
+                  (cons
+                   (cons (cadaar ee) (resolve (caar ee) e))
+                   (loop (cdr ee))))))
+          (else 'yes))))
 
-(define db
+(define db-big
   '(((roundedrect id497))
     ((metadata id495 id498))
     ((ellipse id568))
@@ -399,23 +424,45 @@
     ((geometry_center_y id491 300.0))
     ((geometry_center_y id476 170.0))
     
-    ((ellipse-geometry (? id) (? cx) (? cy) (? halfw)  (? halfh))
+    ((ellipse-geometry (? id) (? cx) (? cy) (? half-width)  (? half-height))
      (ellipse (? ID))
      (geometry_center_x (? ID) (? CX))
      (geometry_center_y (? ID) (? CY))
-     (geometry_w (? ID) (? HalfW))
-     (geometry_h (? ID) (? HalfH)))
+     (geometry_w (? ID) (? Half-Width))
+     (geometry_h (? ID) (? Half-Height)))
 ))
 
+(define db
+  '(((man nils))
+    ((mortal (? x)) (man (? x)))))
+
+(define g
+  '((mortal (? x))))
+
+;(define g
+;  '((mortal nils)))
 
 ;(define g 
 ;  '((ellipse (? eee))))
 
-(define g 
-  '((ellipse-geometry (? e) (? cx) (? cy) (? w2) (? h2))))
+;(define g 
+;  '((ellipse-geometry (? e) (? cx) (? cy) (? w-half) (? h-half))))
 
-(define g0
-  '((ellipse (? eid))))
+;(define g0
+;  '((ellipse (? eid))))
                     
   
-(define (test g) (prove8 '() db '() g db empty 1 '()))
+;(define (test g) (prove '() db '() g db empty 1 '()))
+
+(define (htest-1)
+  (let ((fb '(((man nils)))))
+                   (prove '() '((man nils)) fb empty 1 '() '() fb 'no))) 
+(define (htest-2)
+  (let ((fb '(((man nils)))))
+                   (prove '() '((aardvark nils)) fb empty 1 '() '() fb 'no))) 
+(define (htest0)   (prove '() '((man nils)) db empty 1 '() '() db 'no))
+(define (htest1)   (prove '() '((man (? m))) db empty 1 '() '() db 'no))
+(define (htest2)   (prove '() '((mortal nils)) db empty 1 '() '() db 'no))
+(define (htest3)   (prove '() '((mortal (? m))) db empty 1 '() '() db 'no))
+
+(define (bad)    (prove '() db '() '((xxx (? y))) db empty 1 '()))
