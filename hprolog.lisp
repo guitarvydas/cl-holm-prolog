@@ -55,19 +55,20 @@
         results-accumulator
       (back l g r e n c results-accumulator complete-db :yes)))
    (t
-    (let* ((a  (copy (car r) n))
-           (e* (unify (car a) (car g) e)))
-      (if e*
-          (prove (link l g r e n c)
-                  (append (cdr a) `(:r! ,l) (cdr g))
-                  complete-db
-                  e*
-                  (+ 1 n)
-                  l
-                  results-accumulator
-                  complete-db
-                  :yes)
-        (back l g r e n c results-accumulator complete-db success))))))
+    (let* ((a  (copy (car r) n)))
+      (multiple-value-bind (e* success)
+          (unify (car a) (car g) e)
+        (if success
+            (prove (link l g r e n c)
+                   (append (cdr a) `(:r! ,l) (cdr g))
+                   complete-db
+                   e*
+                   (+ 1 n)
+                   l
+                   results-accumulator
+                   complete-db
+                   :yes)
+          (back l g r e n c results-accumulator complete-db success)))))))
 
 
 (defparameter *empty* '((:bottom)))
@@ -126,17 +127,18 @@
   (cons (list x y) e))
 
 (defun unify (x y e)
+  ;; return (values bindings success)
   (let ((x (value x e))
         (y (value y e)))
     (cond
-     ((eq? x y) e)
-     ((var? x) (bind x y e))
-     ((var? y) (bind y x e))
+     ((eq? x y) (values e t))
+     ((var? x) (values (bind x y e) t))
+     ((var? y) (values (bind y x e) t))
      ((or (not (pair? x))
-          (not (pair? y))) +false+)
+          (not (pair? y))) (values +false+ nil))
      (t
       (let ((e* (unify (car x) (car y) e)))
-        (and e* (unify (cdr x) (cdr y) e*)))))))
+        (values (and e* (unify (cdr x) (cdr y) e*)) t))))))
 
 
 (defun resolve (x e)
