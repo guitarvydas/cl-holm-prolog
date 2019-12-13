@@ -1,3 +1,6 @@
 (defpackage cl-holm-prolog
   (:nicknames :hprolog)
-  (:use :cl))
+  (:use :cl)
+  (:export
+   #:prove
+   #:*empty*))

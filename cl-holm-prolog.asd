@@ -1,4 +1,4 @@
-(defsystem "cl-holm-prolog"
+(defsystem :cl-holm-prolog
   :depends-on (loops)
   :around-compile (lambda (next)
                     (proclaim '(optimize (debug 0)
@@ -10,13 +10,14 @@
                         :components ((:file "package")
                                      (:file "hprolog" :depends-on ("package"))))))
 
-(defsystem "cl-holm-prolog/test"
+(defsystem :cl-holm-prolog/test
+  :depends-on (:cl-holm-prolog)
   :around-compile (lambda (next)
                     (proclaim '(optimize (debug 3)
                                          (safety 3)
                                          (speed 0)))
                     (funcall next))
-  :components ((:module "testing"
+  :components ((:module "test"
                         :pathname "./"
                         :components ((:file "package")
-                                     (:file "prolog-6" :depends-on ("package"))))))
+                                     (:file "test" :depends-on ("package"))))))

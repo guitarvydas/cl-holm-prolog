@@ -2,7 +2,6 @@
 
 (defconstant +true+ t)
 (defconstant +false+ nil)
-(defparameter *db* nil)
 
 (defun null? (x) (null x))
 (defun pair? (x) (and (not (null x)) (or (listp x) (consp x))))
@@ -28,47 +27,51 @@
   (rplaca (cddr x) '(())))
   ;(set-car! (cddr x) '(())))
 
+(defun show8 (rule l g r e n c results-accumulator complete-db success)
+  (declare (ignorable complete-db l g r e n c results-accumulator))
+  (format *standard-output* "~&~S ~S ~S ~S ~S ~S ~S ~S ~S~%~%" rule l g r e n c results-accumulator success))
 
-(defun back7 (l g r e n c results-accumulator)
-  (push `(back7 ,l ,g ,r ,e ,n ,c ,results-accumulator) cl-user::*dump*)
+(defun back (l g r e n c results-accumulator complete-db success)
+  (show8 :back l g r e n c results-accumulator complete-db success)
   (cond
    ((and (pair? g)
          (pair? r))
-    (prove7 l g (cdr r) e n c results-accumulator))
+    (prove l g (cdr r) e n c results-accumulator complete-db success))
    ((pair? l)
-    (prove7 (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l) results-accumulator))))
+    (prove (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l) results-accumulator complete-db success))))
 
-(defun prove7 (l g r e n c results-accumulator)
-  (push `(prove7 ,l ,g ,r ,e ,n ,c ,results-accumulator) cl-user::*dump*)
+(defun prove (l g r e n c results-accumulator complete-db success)
+  (show8 :prove l g r e n c results-accumulator complete-db success)
   (cond
    ((null? g)
-    (back7 l g r e n c (cons (collect-frame e) results-accumulator)))
+    (back l g r e n c (cons (collect-frame e) results-accumulator) complete-db success))
    ((eq? :! (car g))
     (clear_r c)
-    (prove7 c (cdr g) r e n c results-accumulator))
+    (prove c (cdr g) r e n c results-accumulator complete-db success))
    ((eq? :r! (car g))
-    (prove7 l (cddr g) r e n (cadr g) results-accumulator))
+    (prove l (cddr g) r e n (cadr g) results-accumulator complete-db success))
    ((null? r)
     (if (null? l)
         results-accumulator
-      (back7 l g r e n c results-accumulator)))
+      (back l g r e n c results-accumulator complete-db :yes)))
    (t
     (let* ((a  (copy (car r) n))
            (e* (unify (car a) (car g) e)))
       (if e*
-          (prove7 (link l g r e n c)
+          (prove (link l g r e n c)
                   (append (cdr a) `(:r! ,l) (cdr g))
-                  *db*
+                  complete-db
                   e*
                   (+ 1 n)
                   l
-                  results-accumulator)
-        (back7 l g r e n c results-accumulator))))))
+                  results-accumulator
+                  complete-db
+                  :yes)
+        (back l g r e n c results-accumulator complete-db success))))))
 
 
-(defparameter empty '((bottom)))
+(defparameter *empty* '((:bottom)))
 
-;(define var '?)
 (defun name (x) (cadr x))
 (defun htime (x) (cddr x))
 
@@ -123,7 +126,6 @@
   (cons (list x y) e))
 
 (defun unify (x y e)
-  (push (list 'unify x y e) cl-user::*dump*)
   (let ((x (value x e))
         (y (value y e)))
     (cond
@@ -168,68 +170,8 @@
                              (push
                               (cons (cadaar ee) (resolve (caar ee) e))
                               result))
-                            (t (tail-rec-loop (cdr ee))))))))
+                            (t (tail-rec-loop (cdr ee)))))
+                     (t 'yes))))
       (tail-rec-loop e)
       result)))
     
-
-
-;; Graph example from section 1
-(defparameter db1 '(((edge a b))
-                   ((edge a f))
-                   ((edge a g))
-                   ((edge b c))
-                   ((edge b d))
-                   ((edge c d))
-                   ((edge c e))
-                   ((edge g h))
-                   ((edge d h))
-                   ((edge h e))
-                   ((edge h f))
-                   
-                   ((path (:? A) (:? B) ((:? A) (:? B)))
-                    (edge (:? A) (:? B)))
-                   
-                   ((path (:? A) (:? B) ((:? A) . (:? CB)))
-                    (edge (:? A) (:? C))
-                    (path (:? C) (:? B) (:? CB)))))
-
-(defparameter goals1 '((path a f (:? P))))
-
-;; Negation as failure
-
-(defparameter db2
-  '(((some foo))
-    ((some bar))
-    ((some baz))
-
-    ((eq (:? X) (:? X)))
-
-    ((neq (:? X) (:? Y))
-     (eq (:? X) (:? Y)) :! fail)
-
-    ((neq (:? X) (:? Y)))))
-
-(defparameter goals2 '((some (:? X))
-                       (some (:? Y))
-                       (neq (:? X) (:? Y))))
-
-(defun test2 ()
-; 9-slide PROVE
-  ;; pt - should result in 6 answers, where X != Y
-  (setf *db* db2)
-  (prove7 '() goals2 db2 empty 1 '() nil))
-
-(defparameter goals3 '((some (:? X))
-                       (some (:? Y))))
-
-(defun test3 ()
-  ;; pt - should result in 9 answers, where sometimes X == Y
-  (setf *db* db2)
-  (prove7 '() goals3 db2 empty 1 '() nil))
-
-(defun test4 ()
-  (setf *db* db1)
-  (prove7 '() goals1 db1 empty 1 '() nil))
-
-
