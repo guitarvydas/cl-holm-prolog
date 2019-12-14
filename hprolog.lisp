@@ -31,7 +31,7 @@
   (cond
    ((and (pair? g)
          (pair? r))
-    (prove l g (cdr r) e n c complete-db result))
+    (prove l g (cdr r) e n c complete-db))
    ((pair? l)
     (prove (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l) complete-db))))
 
@@ -169,4 +169,5 @@
                              (format *standard-output* "~&~S = ~S~%" (cadaar ee) (resolve (caar ee) e))
                              (push (cons (cadaar ee) (resolve (caar ee) e)) result)                            
                              (tail-rec-loop (cdr ee))))))))
-      (tail-rec-loop e))))
+      (tail-rec-loop e))
+    result))
