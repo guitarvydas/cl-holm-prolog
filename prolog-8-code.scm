@@ -139,7 +139,16 @@
            (not (pair? y))) #f)
       (else
         (let ((e* (unify (car x) (car y) e)))
-          (and e* (unify (cdr x) (cdr y) e*)))))))
+          (let ((ee* (and e* (unify (cdr x) (cdr y) e*))))
+            (display "unify e*/e** ")
+            (display e*)
+            (display " ")
+            (display ee*)
+            (newline)
+            (display "unify returns ")
+            (display ee*)
+            (newline)
+            ee*))))))
 
 
 (define (resolve x e)

@@ -27,33 +27,28 @@
   (rplaca (cddr x) '(())))
   ;(set-car! (cddr x) '(())))
 
-(defun show8 (rule l g r e n c results-accumulator complete-db success)
-  (declare (ignorable complete-db l g r e n c results-accumulator))
-  (format *standard-output* "~&~S ~S ~S ~S ~S ~S ~S ~S ~S~%~%" rule l g r e n c results-accumulator success))
-
-(defun back (l g r e n c results-accumulator complete-db success)
-  (show8 :back l g r e n c results-accumulator complete-db success)
+(defun back (l g r e n c complete-db)
   (cond
    ((and (pair? g)
          (pair? r))
-    (prove l g (cdr r) e n c results-accumulator complete-db success))
+    (prove l g (cdr r) e n c complete-db))
    ((pair? l)
-    (prove (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l) results-accumulator complete-db success))))
+    (prove (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l) complete-db))))
 
-(defun prove (l g r e n c results-accumulator complete-db success)
-  (show8 :prove l g r e n c results-accumulator complete-db success)
+(defun prove (l g r e n c complete-db)
   (cond
    ((null? g)
-    (back l g r e n c (cons (collect-frame e) results-accumulator) complete-db success))
+    (print-frame e)
+    (back l g r e n c complete-db))
    ((eq? :! (car g))
     (clear_r c)
-    (prove c (cdr g) r e n c results-accumulator complete-db success))
+    (prove c (cdr g) r e n c complete-db))
    ((eq? :r! (car g))
-    (prove l (cddr g) r e n (cadr g) results-accumulator complete-db success))
+    (prove l (cddr g) r e n (cadr g) complete-db))
    ((null? r)
     (if (null? l)
-        results-accumulator
-      (back l g r e n c results-accumulator complete-db :yes)))
+        'true
+      (back l g r e n c complete-db)))
    (t
     (let* ((a  (copy (car r) n)))
       (multiple-value-bind (e* success)
@@ -61,14 +56,12 @@
         (if success
             (prove (link l g r e n c)
                    (append (cdr a) `(:r! ,l) (cdr g))
-                   complete-db
+                   complete-db ;; ! - start from top
                    e*
                    (+ 1 n)
                    l
-                   results-accumulator
-                   complete-db
-                   :yes)
-          (back l g r e n c results-accumulator complete-db success)))))))
+                   complete-db)
+          (back l g r e n c complete-db)))))))
 
 
 (defparameter *empty* '((:bottom)))
@@ -137,9 +130,24 @@
      ((or (not (pair? x))
           (not (pair? y))) (values +false+ nil))
      (t
-      (let ((e* (unify (car x) (car y) e)))
-        (values (and e* (unify (cdr x) (cdr y) e*)) t))))))
-
+      (multiple-value-bind (e* success)
+          (unify (car x) (car y) e)
+        #+nil(format *standard-output* "~&unify e*/success ~S ~S~%" e* success)
+        (if success
+            (multiple-value-bind (ee* success2)
+                (unify (cdr x) (cdr y) e*)
+              #+nil(format *standard-output* "~&unify/2 ee*/success2 ~S ~S~%" ee* success2)
+              (if success2
+                  (progn
+                    #+nil(format *standard-output* "~&unify returns T ee*=~S~%" ee*)
+                    (values ee* t))
+                (progn
+                    #+nil(format *standard-output* "~&unify returns #f #f~%" ee*)
+                    (values +false+ nil))
+                ))
+          (progn
+            #+nil(format *standard-output* "~&unify returns #f #f~%" ee*)
+            (values +false+ nil))))))))
 
 (defun resolve (x e)
   (cond ((not (pair? x)) x)
@@ -164,7 +172,16 @@
 ;;;                     (newline)))
 ;;;             (loop (cdr ee))))))
 
-(defun collect-frame (e)
+(defun print-frame (e)
+  (let ((result nil))
+    (labels ((tail-rec-loop (ee)
+               (cond ((pair? (cdr ee))
+                      (cond ((null? (htime (caar ee)))
+                             (format *standard-output* "~&~S = ~S~%" (cadaar ee) (resolve (caar ee) e)))
+                            (t (tail-rec-loop (cdr ee))))))))
+      (tail-rec-loop e))))
+
+#+nil(defun collect-frame (e)
   (let ((result nil))
     (labels ((tail-rec-loop (ee)
                (cond ((pair? (cdr ee))
