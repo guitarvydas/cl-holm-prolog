@@ -358,7 +358,18 @@
                     top-cut
                     complete-db
                     nil)))
-      r)))
+      (let ((rr (mapcar #'(lambda (lis)
+                            (assert (= 5 (length lis)))
+                            (let ((id (cdr (first lis)))
+                                  (cx (cdr (second lis)))
+                                  (cy (cdr (third lis)))
+                                  (hw (cdr (fourth lis)))
+                                  (hh (cdr (fifth lis))))
+                              (list id cx cy hw hh)))
+                        r)))
+        rr))))
+                  
+
 
 (defun htest () (cl-user::htest))
 (defun hteste () (cl-user::hteste))
