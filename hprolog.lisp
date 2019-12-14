@@ -38,7 +38,7 @@
 (defun prove (l g r e n c complete-db result)
   (cond
    ((null? g)
-    (back l g r e n c complete-db (cons (print-and-collect-frame e) result)))
+    (back l g r e n c complete-db (cons (collect-frame e) result)))
    ((eq? :! (car g))
     (clear_r c)
     (prove c (cdr g) r e n c complete-db result))
@@ -148,12 +148,11 @@
           (resolve (car x) e)
           (resolve (cdr x) e)))))
 
-(defun print-and-collect-frame (e)
+(defun collect-frame (e)
   (let ((result nil))
     (labels ((tail-rec-loop (ee)
                (cond ((pair? (cdr ee))
                       (cond ((null? (htime (caar ee)))
-                             (format *standard-output* "~&~S = ~S~%" (cadaar ee) (resolve (caar ee) e))
                              (push (cons (cadaar ee) (resolve (caar ee) e)) result)                            
                              (tail-rec-loop (cdr ee))))))))
       (tail-rec-loop e))
