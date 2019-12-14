@@ -345,19 +345,20 @@
         (top-link nil)
         (top-env *empty*)
         (top-cut nil))
-    (prove top-link
-                   '((:ellipse-geometry
-                               (:? eid)
-                               (:? cx)
-                               (:? cy)
-                               (:? hw)
-                               (:? hh)))
-                   initial-db
-                   top-env
-                   1
-                   top-cut
-                   complete-db
-                   nil)))
+    (let ((r (prove top-link
+                    '((:ellipse-geometry
+                       (:? eid)
+                       (:? cx)
+                       (:? cy)
+                       (:? hw)
+                       (:? hh)))
+                    initial-db
+                    top-env
+                    1
+                    top-cut
+                    complete-db
+                    nil)))
+      r)))
 
 (defun htest () (cl-user::htest))
 (defun hteste () (cl-user::hteste))
