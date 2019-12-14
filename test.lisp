@@ -19,7 +19,7 @@
           (top-link nil)
           (top-env *empty*)
           (top-cut nil))
-      (prove top-link '((:aardvark :nils)) initial-db top-env 1 top-cut complete-db))))
+      (prove top-link '((:aardvark :nils)) initial-db top-env 1 top-cut complete-db nil))))
 
 (defun cl-user::htest-1 ()
   (let ((fb '(((:man :nils)))))
@@ -28,7 +28,7 @@
           (top-link nil)
           (top-env *empty*)
           (top-cut nil))
-      (prove top-link '((:man :nils)) initial-db top-env 1 top-cut complete-db))))
+      (prove top-link '((:man :nils)) initial-db top-env 1 top-cut complete-db nil))))
 
 (defun cl-user::htest0 ()
   (let ((complete-db db)
@@ -36,7 +36,7 @@
         (top-link nil)
         (top-env *empty*)
         (top-cut nil))
-    (prove top-link '((:man :nils)) initial-db top-env 1 top-cut complete-db)))
+    (prove top-link '((:man :nils)) initial-db top-env 1 top-cut complete-db nil )))
 
 (defun cl-user::htest1 ()
   (let ((complete-db db)
@@ -44,7 +44,7 @@
         (top-link nil)
         (top-env *empty*)
         (top-cut nil))
-    (prove top-link '((:man (:? cl-user::m))) initial-db top-env 1 top-cut complete-db)))
+    (prove top-link '((:man (:? cl-user::m))) initial-db top-env 1 top-cut complete-db nil)))
 
 
 (defun cl-user::htest2 ()
@@ -55,7 +55,7 @@
         (top-cut nil)
         (top-results-accum nil)
         (top-success :no))
-    (prove top-link '((:mortal :nils)) initial-db top-env 1 top-cut complete-db)))
+    (prove top-link '((:mortal :nils)) initial-db top-env 1 top-cut complete-db nil)))
 
 (defun cl-user::htest3 ()
   (let ((complete-db db)
@@ -63,7 +63,7 @@
         (top-link nil)
         (top-env *empty*)
         (top-cut nil))
-    (prove top-link '((:mortal (:? cl-user::m))) initial-db top-env 1 top-cut complete-db)))
+    (prove top-link '((:mortal (:? cl-user::m))) initial-db top-env 1 top-cut complete-db nil)))
 
 (defparameter db
   '(((:roundedrect :id497))
@@ -337,7 +337,7 @@
         (top-link nil)
         (top-env *empty*)
         (top-cut nil))
-    (prove top-link '((:ellipse (:? e))) initial-db top-env 1 top-cut complete-db)))
+    (prove top-link '((:ellipse (:? e))) initial-db top-env 1 top-cut complete-db nil)))
 
 (defun cl-user::hteste ()
   (let ((complete-db db)
@@ -356,7 +356,8 @@
                    top-env
                    1
                    top-cut
-                   complete-db)))
+                   complete-db
+                   nil)))
 
 (defun htest () (cl-user::htest))
 (defun hteste () (cl-user::hteste))

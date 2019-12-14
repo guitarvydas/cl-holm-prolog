@@ -27,28 +27,27 @@
   (rplaca (cddr x) '(())))
   ;(set-car! (cddr x) '(())))
 
-(defun back (l g r e n c complete-db)
+(defun back (l g r e n c complete-db result)
   (cond
    ((and (pair? g)
          (pair? r))
-    (prove l g (cdr r) e n c complete-db))
+    (prove l g (cdr r) e n c complete-db result))
    ((pair? l)
-    (prove (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l) complete-db))))
+    (prove (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l) complete-db result))))
 
-(defun prove (l g r e n c complete-db)
+(defun prove (l g r e n c complete-db result)
   (cond
    ((null? g)
-    (print-and-collect-frame e)
-    (back l g r e n c complete-db))
+    (back l g r e n c complete-db (cons (print-and-collect-frame e) result)))
    ((eq? :! (car g))
     (clear_r c)
-    (prove c (cdr g) r e n c complete-db))
+    (prove c (cdr g) r e n c complete-db result))
    ((eq? :r! (car g))
-    (prove l (cddr g) r e n (cadr g) complete-db))
+    (prove l (cddr g) r e n (cadr g) complete-db result))
    ((null? r)
     (if (null? l)
-        'true
-      (back l g r e n c complete-db)))
+        result
+      (back l g r e n c complete-db result)))
    (t
     (let* ((a  (copy (car r) n)))
       (multiple-value-bind (e* success)
@@ -60,8 +59,9 @@
                    e*
                    (+ 1 n)
                    l
-                   complete-db)
-          (back l g r e n c complete-db)))))))
+                   complete-db
+                   result)
+          (back l g r e n c complete-db result)))))))
 
 
 (defparameter *empty* '((:bottom)))
@@ -72,19 +72,6 @@
 (defun var? (x)
   (and (pair? x)
        (eq? :? (car x))))
-
-;; (defun lookup (v e)
-;;   (let ((id (name v))
-;;         (tm  (htime v)))
-;;     (labels ((tail-rec-loop (e) ;; Let Over Lambda shows how to do this in CL, with actual tail recursion
-;;              (cond ((not (pair? (caar e)))
-;;                     +false+)
-;;                    ((and (eq? id (name (caar e)))
-;;                          (eqv? tm (htime (caar e))))
-;;                     (car e))
-;;                    (t
-;;                     (tail-rec-loop (cdr e))))))
-;;       (tail-rec-loop e))))
 
 (defun lookup (v orig-e)
   (let ((id (name v))
