@@ -324,12 +324,12 @@
     ((:geometry_center_y :id491 300.0))
     ((:geometry_center_y :id476 170.0))
 
-    ((ellipse-geometry (:? id) (:? cx) (:? cy) (:? hw) (:? hh))
-     (ellipse (? id))
-     (geometry_center_x (? id) (? cx))
-     (geometry_center_y (? id) (? cy))
-     (geometry_w (? id) (? hw))
-     (geometry_h (? id) (? hh)))))
+    ((:ellipse-geometry (:? id) (:? cx) (:? cy) (:? hw) (:? hh))
+     (:ellipse (:? id))
+     (:geometry_center_x (:? id) (:? cx))
+     (:geometry_center_y (:? id) (:? cy))
+     (:geometry_w (:? id) (:? hw))
+     (:geometry_h (:? id) (:? hh)))))
 
 (defun cl-user::htest ()
   (let ((complete-db db)
@@ -339,3 +339,21 @@
         (top-cut nil))
     (hprolog:prove top-link '((:ellipse (:? e))) initial-db top-env 1 top-cut complete-db)))
 
+(defun cl-user::hteste ()
+  (let ((complete-db db)
+        (initial-db db)
+        (top-link nil)
+        (top-env hprolog:*empty*)
+        (top-cut nil))
+    (hprolog:prove top-link
+                   '((:ellipse-geometry
+                               (:? eid)
+                               (:? cx)
+                               (:? cy)
+                               (:? hw)
+                               (:? hh)))
+                   initial-db
+                   top-env
+                   1
+                   top-cut
+                   complete-db)))
