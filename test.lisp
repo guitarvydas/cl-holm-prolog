@@ -365,7 +365,11 @@
                                   (cy (cdr (third lis)))
                                   (hw (cdr (fourth lis)))
                                   (hh (cdr (fifth lis))))
-                              (list id cx cy hw hh)))
+                              (list
+                               (list 'bounding_box_left id (- cx hw))
+                               (list 'bounding_box_top id (- cy hh))
+                               (list 'bounding_box_right id (+ cx hw))
+                               (list 'bounding_box_bottom id (+ cy hh)))))
                         r)))
         rr))))
                   
