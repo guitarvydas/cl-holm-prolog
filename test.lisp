@@ -57,7 +57,7 @@
         (top-cut nil)
         (top-results-accum nil)
         (top-success :no))
-    (prove top-link '((:mortal :nils)) initial-db top-env 1 top-cut complete-db nil self)))
+    (prove top-link '((:mortal :nils)) initial-db top-env 1 top-cut complete-db nil *self*)))
 
 (defun cl-user::htest3 ()
   (let ((complete-db db)
@@ -1091,7 +1091,7 @@
 
     ))
 
-(defun cl-user::htest ()
+(defun htest ()
   (let ((complete-db db)
         (initial-db db)
         (top-link nil)
@@ -1099,7 +1099,7 @@
         (top-cut nil))
     (prove top-link '((:ellipse (:? e))) initial-db top-env 1 top-cut complete-db nil *self*)))
 
-(defun cl-user::hteste ()
+(defun hteste ()
   (let ((idb (cons
               '((:ellipse-geometry (:? id) (:? cx) (:? cy) (:? hw) (:? hh))
                 (:ellipse (:? id))
@@ -1141,8 +1141,62 @@
                                  (list 'bounding_box_bottom cl-user::id (+ cl-user::cy cl-user::hh)))))
                           r)))
           rr)))))
+
+
+
+(defun ltest ()
+  (let ((idb (cons
+              '(
+                (:ellipse-geometry (:? id) (:? cx) (:? cy) (:? hw) (:? hh))
+                (:ellipse (:? id))
+                (:geometry_center_x (:? id) (:? cx))
+                (:geometry_center_y (:? id) (:? cy))
+                (:geometry_w (:? id) (:? hw))
+                (:geometry_h (:? id) (:? hh))
+                :lisp (lambda (self l g r e n c result)
+                        (format *standard-output* "~&found ellipse ~A ~A ~A ~A ~A~%"
+                                (resolve 'id e) (resolve 'cx e) (resolve 'cy e)
+                                (resolve 'hw e) (resolve 'hh e))
+                        (values l g r e n c result))
+                )
+              db)))
+    (let ((complete-db idb)
+          (initial-db idb)
+          (top-link nil)
+          (top-env *empty*)
+          (top-cut nil))
+      (let ((r (prove top-link
+                      '((:ellipse-geometry
+                         (:? cl-user::eid)
+                         (:? cl-user::cx)
+                         (:? cl-user::cy)
+                         (:? cl-user::hw)
+                         (:? cl-user::hh)))
+                      initial-db
+                      top-env
+                      1
+                      top-cut
+                      complete-db
+                      nil
+                      *self*)))
+        (let ((rr (mapcar #'(lambda (lis)
+                              (assert (= 5 (length lis)))
+                              (let ((cl-user::id (cdr (first lis)))
+                                    (cl-user::cx (cdr (second lis)))
+                                    (cl-user::cy (cdr (third lis)))
+                                    (cl-user::hw (cdr (fourth lis)))
+                                    (cl-user::hh (cdr (fifth lis))))
+                                (list
+                                 (list 'bounding_box_left cl-user::id (- cl-user::cx cl-user::hw))
+                                 (list 'bounding_box_top cl-user::id (- cl-user::cy cl-user::hh))
+                                 (list 'bounding_box_right cl-user::id (+ cl-user::cx cl-user::hw))
+                                 (list 'bounding_box_bottom cl-user::id (+ cl-user::cy cl-user::hh)))))
+                          r)))
+          rr)))))
                   
 
+  
 
-(defun htest () (cl-user::htest))
-(defun hteste () (cl-user::hteste))
+(defun cl-user::htest () (htest))
+(defun cl-user::hteste () (hteste))
+(defun cl-user::ltest () (ltest))

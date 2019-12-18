@@ -6,6 +6,9 @@
     2 (abort) Return to top loop level 0.
 *** back6 and prove6 need to be mutually tail recursive
    
+** ignoring stack overflow - it goes away if speed=3, debug=0
+** branch pt-20191218-breakout - installing a :lisp rule which can modify everything before continuing
+
 * usage
 ** (ql:quickload :cl-holm-prolog)
 ** (in-package :hprolog)

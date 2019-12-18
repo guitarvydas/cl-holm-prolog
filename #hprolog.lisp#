@@ -45,14 +45,8 @@
    ((eq? :r! (car g))
     (prove l (cddr g) r e n (cadr g) complete-db result self))
    ((eq :lisp (car g)) ; pt - (:lisp fn args) --> (funcall fn self l (cdr g) r e n c result (args)) --> (values l g r e n c result), lisp fn gets a chance to rewrite all 6 params plus result
-    #+nil(let ((lisp-clause (car g)))
-      (format *standard-output* "~%apply ~S ~S~%" (second lisp-clause) (append (list self l (cdr g) r e n c result) (rest (rest lisp-clause))))
-      (multiple-value-bind (new-l new-g new-r new-e new-n new-c new-result)
-          (apply (second lisp-clause) (append (list self l (cdr g) r e n c result)
-                                              (rest (rest lisp-clause))))
-        (prove new-l new-g new-r new-e new-n new-c complete-db new-result self)))
     (format *standard-output* "~&:lisp~%")
-    (prove l (cddr g) e n c complete-db result self))
+    (prove l (cdr g) e n c complete-db result self))
    ((null? r)
     (if (null? l)
         result
