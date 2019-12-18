@@ -27,27 +27,27 @@
   (rplaca (cddr x) '(())))
   ;(set-car! (cddr x) '(())))
 
-(defun back (l g r e n c complete-db result)
+(defun back (l g r e n c complete-db result self)
   (cond
    ((and (pair? g)
          (pair? r))
-    (prove l g (cdr r) e n c complete-db result))
+    (prove l g (cdr r) e n c complete-db result self))
    ((pair? l)
-    (prove (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l) complete-db result))))
+    (prove (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l) complete-db result self))))
 
-(defun prove (l g r e n c complete-db result)
+(defun prove (l g r e n c complete-db result self)
   (cond
    ((null? g)
-    (back l g r e n c complete-db (cons (collect-frame e) result)))
+    (back l g r e n c complete-db (cons (collect-frame e) result) self))
    ((eq? :! (car g))
     (clear_r c)
-    (prove c (cdr g) r e n c complete-db result))
+    (prove c (cdr g) r e n c complete-db result self))
    ((eq? :r! (car g))
-    (prove l (cddr g) r e n (cadr g) complete-db result))
+    (prove l (cddr g) r e n (cadr g) complete-db result self))
    ((null? r)
     (if (null? l)
         result
-      (back l g r e n c complete-db result)))
+      (back l g r e n c complete-db result self)))
    (t
     (let* ((a  (copy (car r) n)))
       (multiple-value-bind (e* success)
@@ -60,8 +60,9 @@
                    (+ 1 n)
                    l
                    complete-db
-                   result)
-          (back l g r e n c complete-db result)))))))
+                   result
+                   self)
+          (back l g r e n c complete-db result self)))))))
 
 
 (defparameter *empty* '((:bottom)))
