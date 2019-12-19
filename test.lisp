@@ -1029,14 +1029,7 @@
     ((:geometry_h :id568 40.0))
     ((:geometry_w :id568 40.0))
     ((:geometry_center_x :id568 4405.0))
-    ((:geometry_center_y :id568 40.0))
-
-    ((:ellipse-geometry (:? id) (:? cx) (:? cy) (:? hw) (:? hh))
-     (:ellipse (:? id))
-     (:geometry_center_x (:? id) (:? cx))
-     (:geometry_center_y (:? id) (:? cy))
-     (:geometry_w (:? id) (:? hw))
-     (:geometry_h (:? id) (:? hh)))))
+    ((:geometry_center_y :id568 40.0))))
 
 (defparameter old-goal
   `((:mortal (:? cl-user::x))))
@@ -1160,8 +1153,8 @@
 
 
 
-(defun tester (arg1 l g r e n c result)
-  (format *standard-output* "~&tester ~a~%" arg1)
+(defun asserta (arg1 l g r e n c result)
+  (format *standard-output* "~&asserta ~a~%" arg1)
   (values l g r e n c result))
 
 (defun ltest ()
@@ -1178,7 +1171,7 @@
                   (:geometry_center_y (:? id) (:? cy))
                   (:geometry_w (:? id) (:? hw))
                   (:geometry_h (:? id) (:? hh))
-                  (:lisp cl-holm-prolog::tester 1)
+                  (:lisp (asserta (:is-an-ellipse (:? id))))
                   )
                 db-very-small)))
       (let ((complete-db idb)
