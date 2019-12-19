@@ -1024,6 +1024,20 @@
      (:geometry_w (:? id) (:? hw))
      (:geometry_h (:? id) (:? hh)))))
 
+(defparameter db-very-small
+  '(((:ellipse :id568))
+    ((:geometry_h :id568 40.0))
+    ((:geometry_w :id568 40.0))
+    ((:geometry_center_x :id568 4405.0))
+    ((:geometry_center_y :id568 40.0))
+
+    ((:ellipse-geometry (:? id) (:? cx) (:? cy) (:? hw) (:? hh))
+     (:ellipse (:? id))
+     (:geometry_center_x (:? id) (:? cx))
+     (:geometry_center_y (:? id) (:? cy))
+     (:geometry_w (:? id) (:? hw))
+     (:geometry_h (:? id) (:? hh)))))
+
 (defparameter old-goal
   `((:mortal (:? cl-user::x))))
 
@@ -1158,7 +1172,7 @@
              (values l g r e n c result)))
     (let ((idb (cons
                 '(
-                  (:ellipse-geometry (:? id) (:? cx) (:? cy) (:? hw) (:? hh))
+                  (:ellipse-geo (:? id) (:? cx) (:? cy) (:? hw) (:? hh))
                   (:ellipse (:? id))
                   (:lisp cl-holm-prolog::tester 1)
                   (:geometry_center_x (:? id) (:? cx))
@@ -1166,14 +1180,14 @@
                   (:geometry_w (:? id) (:? hw))
                   (:geometry_h (:? id) (:? hh))
                   )
-                db-small)))
+                db-very-small)))
       (let ((complete-db idb)
             (initial-db idb)
             (top-link nil)
             (top-env *empty*)
             (top-cut nil))
         (let ((r (prove top-link
-                        '((:ellipse-geometry
+                        '((:ellipse-geo
                            (:? cl-user::eid)
                            (:? cl-user::cx)
                            (:? cl-user::cy)
