@@ -58,7 +58,8 @@
                                            lis))
                                (rest sexpr))))
           (multiple-value-bind (ll gg rr ee nn cc resultresult) 
-              (apply fn (append arglist (list l g r e n c result))) (declare (ignore gg))
+              (apply fn self (append arglist (list l g r e n c result)))
+            (declare (ignore gg))
             (prove ll (cdr g) rr ee nn cc complete-db resultresult self))))))
 
    ((null? r)
@@ -126,6 +127,17 @@
 
 (defun unify (x y e)
   ;; return (values bindings success)
+
+  (when (and x
+             (symbolp x)
+             (not (eq (find-package "KEYWORD") (symbol-package x))))
+    (error (format nil "goals must use KEYWORD symbols, but got ~S" x)))
+
+  (when (and y
+             (symbolp y)
+             (not (eq (find-package "KEYWORD") (symbol-package y))))
+    (error (format nil "goals must use KEYWORD symbols, but got ~S" y)))
+
   (let ((x (value x e))
         (y (value y e)))
     (cond
