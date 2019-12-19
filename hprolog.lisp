@@ -49,7 +49,7 @@
     (let ((lisp-clause (car g)))
       (format *standard-output* "~&:lisp~%")
       (multiple-value-bind (ll gg rr ee nn cc resultresult)
-          (apply (cadar g) (list l g r e n c result))
+          (apply (cadar g) (append (list l) (list g r e n c result)))
         (prove ll (cdr g) rr ee nn cc complete-db resultresult self))))
    ((null? r)
     (if (null? l)
