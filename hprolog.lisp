@@ -46,9 +46,10 @@
     (prove l (cddr g) r e n (cadr g) complete-db result self))
    ((and (listp (car g))
          (eq :lisp (caar g)))
-    (format *standard-output* "~&:lisp~%")
-    (funcall (cadar g))
-    (prove l (cdr g) r e n c complete-db result self))
+    (let ((lisp-clause (car g)))
+      (format *standard-output* "~&:lisp~%")
+      (apply (cadar g) (list l g r e n c result))
+      (prove l (cdr g) r e n c complete-db result self)))
    ((null? r)
     (if (null? l)
         result

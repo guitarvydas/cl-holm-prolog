@@ -1146,26 +1146,27 @@
 
 
 
+(defun tester (l g r e n c result)
+  (format *standard-output* "~&tester~%")
+  (values l g r e n c result))
+
 (defun ltest ()
   (labels ((printit (self l g r e n c result)
              (format *standard-output* "~&found ellipse ~A ~A ~A ~A ~A~%"
                      (resolve 'id e) (resolve 'cx e) (resolve 'cy e)
                      (resolve 'hw e) (resolve 'hh e))
-             (values l g r e n c result))
-           (tester ()
-             (format *standard-output* "~&tester~%")
              (values l g r e n c result)))
     (let ((idb (cons
                 '(
                   (:ellipse-geometry (:? id) (:? cx) (:? cy) (:? hw) (:? hh))
                   (:ellipse (:? id))
-                  (:lisp (tester))
+                  (:lisp cl-holm-prolog::tester 1)
                   (:geometry_center_x (:? id) (:? cx))
                   (:geometry_center_y (:? id) (:? cy))
                   (:geometry_w (:? id) (:? hw))
                   (:geometry_h (:? id) (:? hh))
                   )
-                db)))
+                db-small)))
       (let ((complete-db idb)
             (initial-db idb)
             (top-link nil)
