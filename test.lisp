@@ -1174,11 +1174,11 @@
                 '(
                   (:ellipse-geo (:? id) (:? cx) (:? cy) (:? hw) (:? hh))
                   (:ellipse (:? id))
-                  (:lisp cl-holm-prolog::tester 1)
                   (:geometry_center_x (:? id) (:? cx))
                   (:geometry_center_y (:? id) (:? cy))
                   (:geometry_w (:? id) (:? hw))
                   (:geometry_h (:? id) (:? hh))
+                  (:lisp cl-holm-prolog::tester 1)
                   )
                 db-very-small)))
       (let ((complete-db idb)
