@@ -1146,8 +1146,8 @@
 
 
 
-(defun tester (l g r e n c result)
-  (format *standard-output* "~&tester~%")
+(defun tester (arg1 l g r e n c result)
+  (format *standard-output* "~&tester ~a~%" arg1)
   (values l g r e n c result))
 
 (defun ltest ()
