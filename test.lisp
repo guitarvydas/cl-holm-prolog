@@ -1152,7 +1152,9 @@
                      (resolve 'id e) (resolve 'cx e) (resolve 'cy e)
                      (resolve 'hw e) (resolve 'hh e))
              (values l g r e n c result))
-           (tester () (format *standard-output* "~&tester~%")))
+           (tester ()
+             (format *standard-output* "~&tester~%")
+             (values l g r e n c result)))
     (let ((idb (cons
                 '(
                   (:ellipse-geometry (:? id) (:? cx) (:? cy) (:? hw) (:? hh))

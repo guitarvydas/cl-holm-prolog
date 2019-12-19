@@ -47,6 +47,7 @@
    ((and (listp (car g))
          (eq :lisp (caar g)))
     (format *standard-output* "~&:lisp~%")
+    (funcall (cadar g))
     (prove l (cdr g) r e n c complete-db result self))
    ((null? r)
     (if (null? l)
