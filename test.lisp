@@ -1154,7 +1154,7 @@
 
 
 (defun asserta (arg1 l g r e n c result)
-  (format *standard-output* "~&asserta ~a~%" arg1)
+  (format *standard-output* "~&asserta ~S~%" arg1)
   (values l g r e n c result))
 
 (defun ltest ()
