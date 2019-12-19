@@ -1173,7 +1173,7 @@
                   (:geometry_h (:? id) (:? hh))
                   (:lisp (asserta (:is-an-ellipse (:? id))))
                   )
-                db-very-small)))
+                db)))
       (let ((complete-db idb)
             (initial-db idb)
             (top-link nil)
