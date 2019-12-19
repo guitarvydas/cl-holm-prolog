@@ -1,0 +1,166 @@
+Please complete this bug report template and mail it to the address shown.
+
+Subject: seg fault
+To: lisp-support@lispworks.com
+
+
+DESCRIPTION: seg fault <and a simple test case, if possible>
+
+IMPACT: Broken
+
+URGENCY: Next Release
+
+This code is buggy, but causes an unexpected register dump while debugging a new feature that I'm trying to suss out.  
+(See (:lisp) in test.lisp - the problem is related to that line.  If I "#+nil" the line, everything works fine).
+The cl-holm-prolog code was ported from Scheme (r5rs) http://t3x.org/bits/prolog6.html.  It worked in its virgin form, until I started to add this feature.
+
+(ql:quickload :cl-holm/prolog/test)
+(cl-holm-prolog::ltest)
+<segfault>
+
+This sequence also causes a memory corruption message in SBCL.
+
+.ZIP of code is attached.
+
+pt
+
+
+
+PRODUCT CONFIGURATION:
+
+  LispWorks 7.1.2
+
+Process name: /Applications/LispWorks 7.1 (64-bit)/LispWorks (64-bit).app/Contents/MacOS/lispworks-7-1-0-amd64-darwin
+   ID: 8186    Started at: 2019/12/19 9:28:21
+
+Save history:
+
+1: lispworks-7-1-0-0-amd64-darwin-release-base
+Saved by martin as lispworks-7-1-0-0-amd64-darwin-release-base, at 17 May 2017 18:56
+
+2: lispworks-7-1-0-0-amd64-darwin-release-cocoa-shaken
+Saved by martin as lispworks-7-1-0-0-amd64-darwin-release-cocoa-shaken, at 17 May 2017 19:13
+
+3: lispworks-7-1-0-0-amd64-darwin-release-cocoa-shaken
+Saved by martin as lispworks-7-1-0-amd64-darwin, at 16 Oct 2017 14:33
+LispWorks 7.1.0
+
+Loaded Modules:  "describe", "inspector-values", "comm", "ASDF", "asdf",
+  "UIOP", "uiop"
+
+Public patches:  PATCH-ITSELF 1.19, CAPI-COCOA 1.15, CAPI 1.15,
+  COCOA 1.1, COMPILER 1.9, EDITOR 1.8, FLI 1.7, FULL 1.8, MP 1.1,
+  OBJC 1.2, SYSTEM64 1.6, SYSTEM 1.29, DELIVERY 1.0, COMM 1.4,
+  KW-TOOLS 1.0, ORACLE 1.0, SQL 1.0, PROLOG 1.0, SQLITE 1.0,
+  FOREIGN-PREPROCESSOR 1.0
+
+Foreign modules:
+  #<FLI::INTERNAL-MODULE :LISP : exports = 0>
+  #<FLI::INTERNAL-MODULE :CALLBACKS : exports = 0>
+  #<FLI::EXTERNAL-MODULE :CARBON-CORE  : handle = #x00000000; exports = 0>
+  #<FLI::EXTERNAL-MODULE COMM::CRYPTO-LIBRARY  : handle = #x00000000; exports = 0>
+  #<FLI::EXTERNAL-MODULE COMM::OPENSSL-LIBRARY  : handle = #x00000000; exports = 0>
+  #<FLI::EXTERNAL-MODULE "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation"  {/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation}: handle = #<Pointer: FLI::MACH-HEADER-POINTER = #x00007FFF38B95000>; exports = 0>
+  #<FLI::EXTERNAL-MODULE "/System/Library/Frameworks/Cocoa.framework/Versions/A/Cocoa"  {/System/Library/Frameworks/Cocoa.framework/Versions/A/Cocoa}: handle = #<Pointer: FLI::MACH-HEADER-POINTER = #x00007FFF35569000>; exports = 0>
+  #<FLI::EXTERNAL-MODULE :DARWIN-LW-OBJC  {/private/var/tmp/lwtemp_Pauls-MacBook-Pro-279_81860k95bAd.dylib}: handle = #<Pointer: FLI::MACH-HEADER-POINTER = #x00000001000B0000>; exports = 0>
+
+Signal Handlers
+2       SYSTEM::SIGINT-HANDLER
+13      SYSTEM::THE-NULL-FUNCTION
+20      SYSTEM::GET-CHILDREN-INF
+23      SYSTEM::THE-NULL-FUNCTION
+30      MP::CALL-BREAK-OF-MP
+31      MP::PANIC
+
+Added features: (:LISPWORKS5+ :LISPWORKS6+ :LISPWORKS7+ :NON-BASE-CHARS-EXIST-P :OS-UNIX :OS-MACOSX :ASDF :ASDF2 :ASDF3 :ASDF3.1 :ASDF3.2 :ASDF3.3 :QUICKLISP)
+
+HOST CONFIGURATION:
+
+  Pauls-MacBook-Pro-279.local (x86 PENTIUM_3), Darwin 19.0.0
+
+LWSerialNumber: LWPRO0710031800124330
+
+Site: Unknown
+
+Backtrace: <please use :BB>
+
+ > Generation 7: 34926024 (0x214EDC8)
+       Cons               4891872 (0x4AA4E0)
+       Non-Pointer        3362056 (0x334D08)
+       Other              8453104 (0x80FBF0)
+       Symbol             2985936 (0x2D8FD0)
+       Function           14805312 (0xE1E940)
+       Non-Pointer-Static 26528 (0x67A0)
+       Mixed-Static       400536 (0x61C98)
+       Weak               680 (0x2A8)
+ -- Segments:
+       Cons               40B0038800 - 40B04E5000
+       Non-Pointer        40C0000800 - 40C0338000
+       Other              40D0038800 - 40D084B000
+       Symbol             40E0038800 - 40E0312000
+       Function           40F0038800 - 40F0E5A000
+       Non-Pointer-Static 4080000800 - 408010F000
+       Mixed-Static       400004E800 - 40001BD000
+       Weak               4100038800 - 4100039000
+================================
+ > Generation 6: 0 (0x0)
+ > Generation 5: 0 (0x0)
+ > Generation 4: 0 (0x0)
+ > Generation 3: 503272 (0x7ADE8)
+       Non-Pointer        174904 (0x2AB38)
+       Other              16416 (0x4020)
+       Symbol             311952 (0x4C290)
+ -- Segments:
+       Non-Pointer        4070000800 - 4071001000
+       Other              4160018800 - 4161019000
+       Symbol             4090018800 - 4090819000
+================================
+ > Generation 2: 7184528 (0x6DA090)
+       Cons               964768 (0xEB8A0)
+       Non-Pointer        2726432 (0x299A20)
+       Other              1284824 (0x139AD8)
+       Symbol             8448 (0x2100)
+       Function           1339560 (0x1470A8)
+       Non-Pointer-Static 860368 (0xD20D0)
+       Weak               128 (0x80)
+ -- Segments:
+       Cons               4190010800 - 4191011000
+       Non-Pointer        41A0000800 - 41A1001000
+       Other              41B0010800 - 41B1011000
+       Symbol             41C0010800 - 41C0811000
+       Function           41D0010800 - 41D0811000
+       Non-Pointer-Static 4040000800 - 4040135000
+       Weak               41E0010800 - 41E0051000
+================================
+ > Generation 1: 10825896 (0xA530A8)
+       Cons               2774896 (0x2A5770)
+       Non-Pointer        1178488 (0x11FB78)
+       Other              6513320 (0x6362A8)
+       Symbol             25488 (0x6390)
+       Function           333192 (0x51588)
+       Weak               512 (0x200)
+ -- Segments:
+       Cons               41F0008800 - 41F0359000
+       Non-Pointer        4200000800 - 4200359000
+       Other              4210008800 - 4210BE1000
+       Symbol             4220008800 - 4220011000
+       Function           4230008800 - 423028C000
+       Weak               40A0008800 - 40A0009000
+================================
+ > Generation 0: 5585536 (0x553A80)
+       Cons               1602400 (0x187360)
+       Non-Pointer        2296160 (0x230960)
+       Other              1632160 (0x18E7A0)
+       Function           54720 (0xD5C0)
+       Weak               96 (0x60)
+ -- Segments:
+       Cons               4010000800 - 401040B000
+       Non-Pointer        4030000800 - 403040B000
+       Other              4020000800 - 402040B000
+       Symbol             4140000800 - 4140101000
+       Function           4060000800 - 4060101000
+       Weak               4170000800 - 4170041000
+================================
+
+Total allocated 59025256 (0x384A768), total size 191315968 (0xB674000) 
+
