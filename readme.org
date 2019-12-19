@@ -7,18 +7,11 @@
 *** back6 and prove6 need to be mutually tail recursive
    
 ** ignoring stack overflow - it goes away if speed=3, debug=0
-** branch pt-20191218-breakout - installing a :lisp rule which can modify everything before continuing
-
-** branch pt-20191219-segfault fails in LWM and sbcl
-** branch pt-20191219b-segfault fails in LWM but gives TYPE-ERROR in sbcle
-** branch pt-20191219b new working branch 
-
+** :lisp rule added to hprolog
 * usage
 ** (ql:quickload :cl-holm-prolog)
 ** (in-package :hprolog)
-** (test2)
-** (test4)
-
+** (cl-user::ltest)
 * todo
 ** rewrite prove6 + back6 for use in looping languages
 
