@@ -1,5 +1,7 @@
 (in-package :cl-holm-prolog)
 
+(defparameter *results* nil)
+
 (defconstant +true+ t)
 (defconstant +false+ nil)
 
@@ -31,19 +33,24 @@
   (cond
    ((and (pair? g)
          (pair? r))
-    (prove l g (cdr r) e n c complete-db result self))
+    (prove-helper l g (cdr r) e n c complete-db result self))
    ((pair? l)
-    (prove (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l) complete-db result self))))
+    (prove-helper (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l) complete-db result self))))
 
 (defun prove (l g r e n c complete-db result self)
+  (setf *results* nil)
+  (prove-helper l g r e n c complete-db result self)
+  *results*)
+
+(defun prove-helper (l g r e n c complete-db result self)
   (cond
    ((null? g)
     (back l g r e n c complete-db (cons (collect-frame e) result) self))
    ((eq? :! (car g))
     (clear_r c)
-    (prove c (cdr g) r e n c complete-db result self))
+    (prove-helper c (cdr g) r e n c complete-db result self))
    ((eq? :r! (car g))
-    (prove l (cddr g) r e n (cadr g) complete-db result self))
+    (prove-helper l (cddr g) r e n (cadr g) complete-db result self))
 
    ((and (listp (car g))
          (eq :lisp (caar g)))
@@ -63,7 +70,7 @@
               (apply fn self (append arglist (list l g r e n c result)))
             (declare (ignore gg))
             (if success
-                (prove ll (cdr g) rr ee nn cc complete-db resultresult self)
+                (prove-helper ll (cdr g) rr ee nn cc complete-db resultresult self)
               (back l (cdr g) r e n c complete-db result self)))))))
               
 
@@ -73,10 +80,12 @@
       (back l g r e n c complete-db result self)))
    (t
     (let* ((a  (copy (car r) n)))
+      ;(format *standard-output* "~&~S~%" a)
+      ;(format *standard-output* "~&result ~S~%" result)
       (multiple-value-bind (e* success)
           (unify (car a) (car g) e)
         (if success
-            (prove (link l g r e n c)
+            (prove-helper (link l g r e n c)
                    (append (cdr a) `(:r! ,l) (cdr g))
                    complete-db ;; ! - start from top
                    e*
@@ -190,7 +199,8 @@
     (labels ((tail-rec-loop (ee)
                (cond ((pair? (cdr ee))
                       (cond ((null? (htime (caar ee)))
-                             (push (cons (cadaar ee) (resolve (caar ee) e)) result)                            
-                             (tail-rec-loop (cdr ee))))))))
+                             (push (cons (cadaar ee) (resolve (caar ee) e)) result)))                         
+                      (tail-rec-loop (cdr ee))))))
       (tail-rec-loop e))
+    (push result *results*)
     result))

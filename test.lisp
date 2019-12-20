@@ -1033,6 +1033,9 @@
 
 (defparameter db-very-small2
   '(((:ellipse :id568))
+    ((:text :id1 :str1))
+    ((:text :id2 :str2))
+    ((:used :str1))
     ((:rect :id391))
     ((:bounding_box_left :id391 3585.0))
     ((:bounding_box_top :id391 450.0))
@@ -1248,8 +1251,48 @@
                           initial-db top-env 1 top-cut complete-db nil *self*)))
       (format *standard-output* "~&results ~S~%" results))))
 
+(defun negation-test ()
+  (let ((top-link nil)
+        (top-env *empty*)
+        (top-cut nil))
+    (let ((rule1 '((:not-used (:? id))
+                   (:used (:? id)) ! fail)))
+      (let ((rule2 '((negation-test (:? text-id))
+                     (:text (:? text-id) (:? str-id))
+                     (:not-used (:? str-id)))))
+        (let ((db (append rule1 rule2 db-very-small2)))
+          (let ((initial-db db)
+                (complete-db db)
+                (goal '((negation-test (:? text-id)))))
+            (let ((results (prove top-link goal initial-db top-env 1 top-cut complete-db nil *self*)))
+              (format *standard-output* "~&results ~S~%" results))))))))
+
   
+(defparameter negation-db
+  '(((:some :foo))
+    ((:some :bar))
+    ((:some :baz))
+
+    ((:eq (:? X) (:? X)))
+
+    ((:neq (:? X) (:? Y))
+     (:eq (:? X) (:? Y)) :! :fail)
+
+    ((:neq (:? X) (:? Y)))))
+
+(defparameter negation-goals
+  '((:some (:? X))
+    (:some (:? Y))
+    (:neq (:? X) (:? Y))))
+
+(defun negation-test1 ()
+  (let ((complete-db negation-db)
+        (initial-db negation-db)
+        (top-link nil)
+        (top-env *empty*)
+        (top-cut nil))
+    (prove top-link negation-goals initial-db top-env 1 top-cut complete-db nil *self*)))
 
 (defun cl-user::htest () (htest))
 (defun cl-user::hteste () (hteste))
-(defun cl-user::ltest () (ltest) (fail-test))
+(defun cl-user::ltest () (ltest) (negation-test1))
