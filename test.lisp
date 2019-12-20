@@ -1222,11 +1222,15 @@
             rr))))))
                   
 
+(defun printf (self arg l g r e n c result)
+  (declare (ignore self g))
+  (format *standard-output* "~&printf ~S~%" arg)
+  (values T l g r e n c result))
+           
 (defun printit (self top left l g r e n c result)
   (declare (ignore self g))
   (format *standard-output* "~&top ~S left ~S~%" top left)
   (values T l g r e n c result))
-           
 
 (defun fail-test ()
   (let ((complete-db db-very-small2)
@@ -1236,7 +1240,9 @@
         (top-cut nil))
     (let ((results (prove top-link '(
                                      (:bounding_box_top :id391 (:? top))
+                                     (:lisp (printf 1))
                                      (:bounding_box_left :id391 (:? left))
+                                     (:lisp (printf 2))
                                      (:lisp (printit (:? top) (:? left)))
                                      )
                           initial-db top-env 1 top-cut complete-db nil *self*)))
