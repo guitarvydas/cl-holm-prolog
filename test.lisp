@@ -1031,6 +1031,18 @@
     ((:geometry_center_x :id568 4405.0))
     ((:geometry_center_y :id568 40.0))))
 
+(defparameter db-very-small2
+  '(((:ellipse :id568))
+    ((:rect :id391))
+    ((:bounding_box_left :id391 3585.0))
+    ((:bounding_box_top :id391 450.0))
+    ((:bounding_box_right :id391 3665.0))
+    ((:bounding_box_bottom :id391 530.0))
+    ((:geometry_h :id568 40.0))
+    ((:geometry_w :id568 40.0))
+    ((:geometry_center_x :id568 4405.0))
+    ((:geometry_center_y :id568 40.0))))
+
 (defparameter old-goal
   `((:mortal (:? cl-user::x))))
 
@@ -1210,8 +1222,28 @@
             rr))))))
                   
 
+(defun printit (self top left l g r e n c result)
+  (declare (ignore self g))
+  (format *standard-output* "~&top ~S left ~S~%" top left)
+  (values T l g r e n c result))
+           
+
+(defun fail-test ()
+  (let ((complete-db db-very-small2)
+        (initial-db db-very-small2)
+        (top-link nil)
+        (top-env *empty*)
+        (top-cut nil))
+    (let ((results (prove top-link '(
+                                     (:bounding_box_top :id391 (:? top))
+                                     (:bounding_box_left :id391 (:? left))
+                                     (:lisp (printit (:? top) (:? left)))
+                                     )
+                          initial-db top-env 1 top-cut complete-db nil *self*)))
+      (format *standard-output* "~&results ~S~%" results))))
+
   
 
 (defun cl-user::htest () (htest))
 (defun cl-user::hteste () (hteste))
-(defun cl-user::ltest () (ltest))
+(defun cl-user::ltest () (ltest) (fail-test))
