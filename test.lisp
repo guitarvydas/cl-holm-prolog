@@ -1156,7 +1156,7 @@
 (defun asserta (self arg1 l g r e n c result)
   (declare (ignore self))
   (format *standard-output* "~&asserta ~S~%" arg1)
-  (values l g r e n c result))
+  (values T l g r e n c result))
 
 (defun ltest ()
   (labels ((printit (self l g r e n c result)

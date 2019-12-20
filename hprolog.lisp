@@ -57,10 +57,13 @@
                                                  x))
                                            lis))
                                (rest sexpr))))
-          (multiple-value-bind (ll gg rr ee nn cc resultresult) 
+          (multiple-value-bind (success ll gg rr ee nn cc resultresult) 
               (apply fn self (append arglist (list l g r e n c result)))
             (declare (ignore gg))
-            (prove ll (cdr g) rr ee nn cc complete-db resultresult self))))))
+            (if success
+                (prove ll (cdr g) rr ee nn cc complete-db resultresult self)
+              (back l (cdr g) r e n c complete-db result self)))))))
+              
 
    ((null? r)
     (if (null? l)
