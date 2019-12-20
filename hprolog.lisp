@@ -57,10 +57,13 @@
                                                  x))
                                            lis))
                                (rest sexpr))))
-          (multiple-value-bind (ll gg rr ee nn cc resultresult) 
+          (multiple-value-bind (success ll gg rr ee nn cc resultresult) 
               (apply fn self (append arglist (list l g r e n c result)))
             (declare (ignore gg))
-            (prove ll (cdr g) rr ee nn cc complete-db resultresult self))))))
+            (if success
+                (prove ll (cdr g) rr ee nn cc complete-db resultresult self)
+              (back l (cdr g) r e n c complete-db result self)))))))
+              
 
    ((null? r)
     (if (null? l)
@@ -130,11 +133,13 @@
 
   (when (and x
              (symbolp x)
+             (not (eq x *empty*))
              (not (eq (find-package "KEYWORD") (symbol-package x))))
     (error (format nil "goals must use KEYWORD symbols, but got ~S" x)))
 
   (when (and y
              (symbolp y)
+             (not (eq y *empty*))
              (not (eq (find-package "KEYWORD") (symbol-package y))))
     (error (format nil "goals must use KEYWORD symbols, but got ~S" y)))
 

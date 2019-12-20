@@ -1153,9 +1153,10 @@
 
 
 
-(defun asserta (arg1 l g r e n c result)
+(defun asserta (self arg1 l g r e n c result)
+  (declare (ignore self))
   (format *standard-output* "~&asserta ~S~%" arg1)
-  (values l g r e n c result))
+  (values NIL l g r e n c result))
 
 (defun ltest ()
   (labels ((printit (self l g r e n c result)
@@ -1173,7 +1174,7 @@
                   (:geometry_h (:? id) (:? hh))
                   (:lisp (asserta (:is-an-ellipse (:? id))))
                   )
-                db)))
+                db-very-small)))
       (let ((complete-db idb)
             (initial-db idb)
             (top-link nil)
