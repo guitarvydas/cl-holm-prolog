@@ -1,7 +1,5 @@
 (in-package :cl-holm-prolog)
 
-(defparameter *results* nil)
-
 (defconstant +true+ t)
 (defconstant +false+ nil)
 
@@ -38,9 +36,7 @@
     (prove-helper (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l) complete-db result self))))
 
 (defun prove (l g r e n c complete-db result self)
-  (setf *results* nil)
-  (prove-helper l g r e n c complete-db result self)
-  *results*)
+  (prove-helper l g r e n c complete-db result self))
 
 (defun prove-helper (l g r e n c complete-db result self)
   (cond
@@ -202,5 +198,4 @@
                              (push (cons (cadaar ee) (resolve (caar ee) e)) result)))                         
                       (tail-rec-loop (cdr ee))))))
       (tail-rec-loop e))
-    (push result *results*)
     result))
