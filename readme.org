@@ -14,4 +14,6 @@
 ** (cl-user::ltest)
 * todo
 ** rewrite prove6 + back6 for use in looping languages
+* branches
+** pt-20191220 - adding T/NIL return from :lisp
 

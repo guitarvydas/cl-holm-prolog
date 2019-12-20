@@ -1153,7 +1153,8 @@
 
 
 
-(defun asserta (arg1 l g r e n c result)
+(defun asserta (self arg1 l g r e n c result)
+  (declare (ignore self))
   (format *standard-output* "~&asserta ~S~%" arg1)
   (values l g r e n c result))
 

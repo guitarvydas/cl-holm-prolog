@@ -130,11 +130,13 @@
 
   (when (and x
              (symbolp x)
+             (not (eq x *empty*))
              (not (eq (find-package "KEYWORD") (symbol-package x))))
     (error (format nil "goals must use KEYWORD symbols, but got ~S" x)))
 
   (when (and y
              (symbolp y)
+             (not (eq y *empty*))
              (not (eq (find-package "KEYWORD") (symbol-package y))))
     (error (format nil "goals must use KEYWORD symbols, but got ~S" y)))
 
