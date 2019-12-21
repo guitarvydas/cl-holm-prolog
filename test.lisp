@@ -1175,6 +1175,7 @@
 
 (defun ltest ()
   (labels ((printit (self l g r e n c result)
+             (declare (ignore self))
              (format *standard-output* "~&found ellipse ~A ~A ~A ~A ~A~%"
                      (resolve 'id e) (resolve 'cx e) (resolve 'cy e)
                      (resolve 'hw e) (resolve 'hh e))
@@ -1226,12 +1227,12 @@
                   
 
 (defun printf (self arg l g r e n c result)
-  (declare (ignore self g))
+  (declare (ignore self))
   (format *standard-output* "~&printf ~S~%" arg)
   (values T l g r e n c result))
            
 (defun printit (self top left l g r e n c result)
-  (declare (ignore self g))
+  (declare (ignore self))
   (format *standard-output* "~&top ~S left ~S~%" top left)
   (values T l g r e n c result))
 
@@ -1305,5 +1306,5 @@
 (defun cl-user::hteste () (hteste))
 (defun cl-user::ltest ()
   (ltest)
-  (negation-test1)
+  (pprint (negation-test1))
   (negation-test2))
