@@ -67,7 +67,7 @@
             (declare (ignore gg))
             (if success
                 (prove-helper ll (cdr g) rr ee nn cc complete-db resultresult self)
-              (back l (cdr g) r e n c complete-db result self)))))))
+              (back ll g rr ee nn cc complete-db resultresult self)))))))
               
 
    ((null? r)
