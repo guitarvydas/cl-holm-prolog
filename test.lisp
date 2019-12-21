@@ -1235,7 +1235,7 @@
   (format *standard-output* "~&top ~S left ~S~%" top left)
   (values T l g r e n c result))
 
-(defun fail-test ()
+(defun printf-test ()
   (let ((complete-db db-very-small2)
         (initial-db db-very-small2)
         (top-link nil)
@@ -1251,23 +1251,6 @@
                           initial-db top-env 1 top-cut complete-db nil *self*)))
       (format *standard-output* "~&results ~S~%" results))))
 
-(defun negation-test ()
-  (let ((top-link nil)
-        (top-env *empty*)
-        (top-cut nil))
-    (let ((rule1 '((:not-used (:? id))
-                   (:used (:? id)) ! fail)))
-      (let ((rule2 '((negation-test (:? text-id))
-                     (:text (:? text-id) (:? str-id))
-                     (:not-used (:? str-id)))))
-        (let ((db (append rule1 rule2 db-very-small2)))
-          (let ((initial-db db)
-                (complete-db db)
-                (goal '((negation-test (:? text-id)))))
-            (let ((results (prove top-link goal initial-db top-env 1 top-cut complete-db nil *self*)))
-              (format *standard-output* "~&results ~S~%" results))))))))
-
-  
 (defparameter negation-db
   '(((:some :foo))
     ((:some :bar))
@@ -1293,6 +1276,34 @@
         (top-cut nil))
     (prove top-link negation-goals initial-db top-env 1 top-cut complete-db nil *self*)))
 
+(defparameter negation-db2
+  `(((:text :id1 :str1))
+    ((:text :id2 :str2))
+    ((:used :str2))
+    ((:unassigned-text (:? text-id))
+     (:text (:? text-id) (:? str-id))
+     (:not-used (:? str-id)))
+    ((:not-used (:? str-id))
+     (:used (:? str-id))
+     :!
+     :fail)
+    ((:not-used (:? str-id)))))
+
+(defun negation-test2 ()
+  (let ((top-link nil)
+        (top-env *empty*)
+        (top-cut nil))
+    (let ((db negation-db2))
+      (let ((initial-db db)
+            (complete-db db)
+            (goal '((:unassigned-text (:? text-id)))))
+        (let ((results (prove top-link goal initial-db top-env 1 top-cut complete-db nil *self*)))
+          (format *standard-output* "~&results ~S~%" results))))))
+
+
 (defun cl-user::htest () (htest))
 (defun cl-user::hteste () (hteste))
-(defun cl-user::ltest () (ltest) (negation-test1))
+(defun cl-user::ltest ()
+  (ltest)
+  (negation-test1)
+  (negation-test2))
