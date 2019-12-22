@@ -1,5 +1,7 @@
 (in-package :cl-holm-prolog)
 
+(defparameter *trace* nil)
+
 (defconstant +true+ t)
 (defconstant +false+ nil)
 
@@ -28,6 +30,10 @@
   ;(set-car! (cddr x) '(())))
 
 (defun back (l g r e n c complete-db result self)
+  (when *trace*
+    (if g
+        (format *standard-output* "~&back  (car g) = ~S~%" (car g))
+      (format *standard-output* "~&back g = NIL~%")))
   (cond
    ((and (pair? g)
          (pair? r))
@@ -39,6 +45,10 @@
   (prove-helper l g r e n c complete-db result self))
 
 (defun prove-helper (l g r e n c complete-db result self)
+  (when *trace*
+    (if g
+        (format *standard-output* "~&prove (car g) = ~S~%" (car g))
+      (format *standard-output* "~&prove g = NIL~%")))
   (cond
    ((null? g)
     (back l g r e n c complete-db (cons (collect-frame e) result) self))
@@ -64,12 +74,21 @@
                                      (resolve y e)))
                                (rest sexpr))))
           (multiple-value-bind (success ll gg rr ee nn cc resultresult) 
-              (apply fn self (append arglist (list l g r e n c result)))
+              (apply fn (append (cons self arglist) (list l g r e n c result)))
             (declare (ignore gg))
             (if success
                 (prove-helper ll (cdr g) rr ee nn cc complete-db resultresult self)
-              (back ll g rr ee nn cc complete-db resultresult self)))))))
-              
+              (back l g r e n c complete-db result self)))))))
+
+   ((and (listp (car g))
+         (eq :traceon (caar g)))
+    (setf *trace* t)
+    (prove-helper l (cdr g) r e n c complete-db result self))
+
+   ((and (listp (car g))
+         (eq :traceoff (caar g)))
+    (setf *trace* nil)
+    (prove-helper l (cdr g) r e n c complete-db result self))
 
    ((null? r)
     (if (null? l)
