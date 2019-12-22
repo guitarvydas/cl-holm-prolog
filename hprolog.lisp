@@ -51,6 +51,7 @@
    ((and (listp (car g))
          (eq :lisp (caar g)))
     (let ((lisp-colon-clause (first g))) ; (:lisp (fn arg arg ...))
+      (assert (= 2 (length lisp-colon-clause))) ;; the :lisp form is badly formed if this assert fails
       (let ((sexpr (second lisp-colon-clause)))
         (let ((fn (first sexpr))
               (arglist (mapcar #'(lambda (y)
@@ -76,8 +77,6 @@
       (back l g r e n c complete-db result self)))
    (t
     (let* ((a  (copy (car r) n)))
-      ;(format *standard-output* "~&~S~%" a)
-      ;(format *standard-output* "~&result ~S~%" result)
       (multiple-value-bind (e* success)
           (unify (car a) (car g) e)
         (if success
