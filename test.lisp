@@ -2,6 +2,7 @@
 
 (defparameter *self* nil) ;; don't need it in this test
 
+#+nil
 (defparameter db
   '(
     ((:arrow :id574))
