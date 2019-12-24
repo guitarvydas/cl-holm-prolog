@@ -42,7 +42,10 @@
     (prove-helper (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l) complete-db result self))))
 
 (defun prove (l g r e n c complete-db result self)
-  (prove-helper l g r e n c complete-db result self))
+  (let ((r (prove-helper l g r e n c complete-db result self)))
+    (unless (null r)
+      (substitute :yes nil r))))
+        
 
 (defun prove-helper (l g r e n c complete-db result self)
   (when *trace*

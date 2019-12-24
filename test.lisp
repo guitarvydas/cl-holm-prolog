@@ -1331,11 +1331,11 @@
 (defun bbtest ()
   (let ((fb (cons rule-bounding-box
                   '(
-                    ((:rect :id391))
-                    ((:bounding_box_left :id391 3585.0))
-                    ((:bounding_box_top :id391 450.0))
-                    ((:bounding_box_right :id391 3665.0))
-                    ((:bounding_box_bottom :id391 530.0))
+                    ((:rect :id3))
+                    ((:bounding_box_left :id3 3585.0))
+                    ((:bounding_box_top :id3 450.0))
+                    ((:bounding_box_right :id3 3665.0))
+                    ((:bounding_box_bottom :id3 530.0))
                     ((:rect :id4))
                     ((:bounding_box_left :id4 3585.0))
                     ((:bounding_box_top :id4 451.0))
@@ -1348,15 +1348,15 @@
                   )))
       (run-prolog nil goal fb))))
 
-#|
 ;;;;
 ;;; test bounding box within bounding box
 ;;;;
 
-(defmethod lisp-BoundingBoxCompletelyInside ((self e/part:part)
-                                             L1 T1 R1 B2
+(defmethod lisp-BoundingBoxCompletelyInside (self
+                                             L1 T1 R1 B1
                                              L2 T2 R2 B2
                                              l g r e n c result)
+  (declare (ignore self))
   (values
    (and (>= L1 L2) (>= T1 T2) (>= R2 R1) (>= B2 B1))
    l g r e n c result))
@@ -1364,35 +1364,56 @@
 (defmethod bounding-box-completely-inside (#+nil(self e/part:part) id1 id2)
   (let ((fb (cons rule-bounding-box
                   '(
-                    ((:rect :id391))
-                    ((:bounding_box_left :id391 3585.0))
-                    ((:bounding_box_top :id391 450.0))
-                    ((:bounding_box_right :id391 3665.0))
-                    ((:bounding_box_bottom :id391 530.0))
-                    ((:rect :id4))
-                    ((:bounding_box_left :id4 3585.0))
-                    ((:bounding_box_top :id4 451.0))
-                    ((:bounding_box_right :id4 33664.0))
-                    ((:bounding_box_bottom :id4 529.0))
-                    ((:bounding-box-completely-inside (:? id1) (:? id2))
+                    ((:rect :id-outer))
+                    ((:bounding_box_left :id-outer 3585.0))
+                    ((:bounding_box_top :id-outer 450.0))
+                    ((:bounding_box_right :id-outer 3665.0))
+                    ((:bounding_box_bottom :id-outer 530.0))
+                    ((:rect :id-inner))
+                    ((:bounding_box_left :id-inner 3586.0))
+                    ((:bounding_box_top :id-inner 451.0))
+                    ((:bounding_box_right :id-inner 3664.0))
+                    ((:bounding_box_bottom :id-inner 529.0))
+
+
+                    ((:bounding-box-completely-inside (:? id10) (:? id20))
                      
-                     (:bounding-box (:? id1) (:? L1) (:? T1) (:? R1) (:? B1))
-                     (:bounding-box (:? id2) (:? L2) (:? T2) (:? R2) (:? B2))
-                     (:lisp (lisp-BoundingBoxCompletelyInside (:? L1) (:? T1) (:? R1) (:? B1)
-                                                              (:? L2) (:? T2) (:? R2) (:? B2)))
+                     (:not-same (:? id10) (:? id20))
+                     (:bounding-box (:? id10) (:? L10) (:? T10) (:? R10) (:? B10))
+                     (:bounding-box (:? id20) (:? L20) (:? T20) (:? R20) (:? B20))
+                     (:lisp (lisp-BoundingBoxCompletelyInside (:? L10) (:? T10) (:? R10) (:? B10)
+                                                              (:? L20) (:? T20) (:? R20) (:? B20)))
                      )
+                    ((:not-same (:? x) (:? x))
+                     :!
+                     :fail)
+                    ((:not-same (:? x) (:? y))
+                     :!)
                     )
                   )))
-      (let ((goal `((:bounding-box-completely-inside (:? ,id1) (:? ,id2)))))
-        (run-prolog self goal fb)))))
-|#
+      (let ((goal `(
+                    (:bounding-box-completely-inside ,id1  ,id2)
+                    (:lisp (printf ""))
+                    (:lisp (printf ,id1))
+                    (:lisp (printf ,id2))
+                    (:lisp (printf "yes"))
+                    )))
+        (run-prolog nil goal fb))))
 
+(defun bb-in1 () (pprint (bounding-box-completely-inside :id-outer :id-inner))) ;; no
+
+(defun bb-in2 () (pprint (bounding-box-completely-inside :id-inner :id-outer)));; yes
+
+(defun bb-in3 () (pprint (bounding-box-completely-inside '(:? inner) '(:? outer)))) ;; returns all inner/outer combinations
 
 (defun cl-user::htest ()
   (htest)
   (hteste)
   (pprint (negation-test1))
   (pprint (negation-test2))
-  (pprint (bbtest)))
+  (pprint (bbtest))
+  (pprint (bb-in1))
+  (pprint (bb-in2))
+  (bb-in3))
 
 
