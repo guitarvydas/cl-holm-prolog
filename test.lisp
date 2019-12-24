@@ -1078,16 +1078,16 @@
       (prove top-link '((:man :nils)) initial-db top-env 1 top-cut complete-db nil *self*))))
 
 (defun cl-user::htest0 ()
-  (let ((complete-db db)
-        (initial-db db)
+  (let ((complete-db db-very-small2)
+        (initial-db db-very-small2)
         (top-link nil)
         (top-env *empty*)
         (top-cut nil))
     (prove top-link '((:man :nils)) initial-db top-env 1 top-cut complete-db nil *self*)))
 
 (defun cl-user::htest1 ()
-  (let ((complete-db db)
-        (initial-db db)
+  (let ((complete-db db-very-small2)
+        (initial-db db-very-small2)
         (top-link nil)
         (top-env *empty*)
         (top-cut nil))
@@ -1095,8 +1095,8 @@
 
 
 (defun cl-user::htest2 ()
-  (let ((complete-db db)
-        (initial-db db)
+  (let ((complete-db db-very-small2)
+        (initial-db db-very-small2)
         (top-link nil)
         (top-env *empty*)
         (top-cut nil)
@@ -1105,8 +1105,8 @@
     (prove top-link '((:mortal :nils)) initial-db top-env 1 top-cut complete-db nil *self*)))
 
 (defun cl-user::htest3 ()
-  (let ((complete-db db)
-        (initial-db db)
+  (let ((complete-db db-very-small2)
+        (initial-db db-very-small2)
         (top-link nil)
         (top-env *empty*)
         (top-cut nil))
@@ -1118,8 +1118,8 @@
 
 (defun htest ()
   (let ((db db-very-small))
-    (let ((complete-db db)
-          (initial-db db)
+    (let ((complete-db db-very-small2)
+          (initial-db db-very-small2)
           (top-link nil)
           (top-env *empty*)
           (top-cut nil))
@@ -1305,6 +1305,16 @@
 
 
 
+
+
+(defun run-prolog (self goal fb)
+  (declare (ignore self))
+  (let ((initial-db fb)
+        (complete-db fb)
+        (top-link nil) (top-env *empty*) (top-cut nil))
+    (let ((results (prove top-link goal initial-db top-env 1 top-cut complete-db nil *self*)))
+      (format *standard-output* "~&results ~S~%" results))))
+
 ;;;;
 ;;; test bounding box rule
 ;;;;
@@ -1328,23 +1338,19 @@
                     ((:bounding_box_bottom :id391 530.0))
                     ((:rect :id4))
                     ((:bounding_box_left :id4 3585.0))
-                    ((:bounding_box_top :id4 450.0))
-                    ((:bounding_box_right :id4 3665.0))
-                    ((:bounding_box_bottom :id4 530.0))
+                    ((:bounding_box_top :id4 451.0))
+                    ((:bounding_box_right :id4 33664.0))
+                    ((:bounding_box_bottom :id4 529.0))
                     )
                   )))
     (let ((goal '(
                   (:bounding-box (:? id) (:? left) (:? top) (:? right) (:? bottom))
                   )))
-      (let ((initial-db fb)
-            (complete-db fb)
-            (top-link nil) (top-env *empty*) (top-cut nil))
-        (let ((results (prove top-link goal initial-db top-env 1 top-cut complete-db nil *self*)))
-          (format *standard-output* "~&results ~S~%" results))))))
+      (run-prolog nil goal fb))))
 
 #|
 ;;;;
-;;; test bounding box rule
+;;; test bounding box within bounding box
 ;;;;
 
 (defmethod lisp-BoundingBoxCompletelyInside ((self e/part:part)
@@ -1353,31 +1359,33 @@
                                              l g r e n c result)
   (values
    (and (>= L1 L2) (>= T1 T2) (>= R2 R1) (>= B2 B1))
-   l g r e n c result))   
+   l g r e n c result))
 
-(defvar rule-bounding-box '(
-                            (:bounding-box (:? id) (:? left) (:? top) (:? right) (:? bottom))
-                            (:bounding_box_left (:? id) (:? left))
-                            (:bounding_box_top (:? id) (:? top))
-                            (:bounding_box_right (:? id) (:? right))
-                            (:bounding_box_bottom (:? id) (:? bottom))
-                            ))
- 
-(defmethod bounding-box-completely-inside ((self e/part:part) id1 id2)
-  (let ((rule '(
-                (:bounding-box-completely-inside (:? id1) (:? id2))
-
-                (:bounding-box (:? id1) (:? L1) (:? T1) (:? R1) (:? B1))
-                (:bounding-box (:? id2) (:? L2) (:? T2) (:? R2) (:? B2))
-                (:lisp (lisp-BoundingBoxCompletelyInside (:? L1) (:? T1) (:? R1) (:? B1)
-                                                    (:? L2) (:? T2) (:? R2) (:? B2)))
-                )
-              ))
-    (let ((fb (cons rule (cl-event-passing-user::@get-instance-var self :fb))))
+(defmethod bounding-box-completely-inside (#+nil(self e/part:part) id1 id2)
+  (let ((fb (cons rule-bounding-box
+                  '(
+                    ((:rect :id391))
+                    ((:bounding_box_left :id391 3585.0))
+                    ((:bounding_box_top :id391 450.0))
+                    ((:bounding_box_right :id391 3665.0))
+                    ((:bounding_box_bottom :id391 530.0))
+                    ((:rect :id4))
+                    ((:bounding_box_left :id4 3585.0))
+                    ((:bounding_box_top :id4 451.0))
+                    ((:bounding_box_right :id4 33664.0))
+                    ((:bounding_box_bottom :id4 529.0))
+                    ((:bounding-box-completely-inside (:? id1) (:? id2))
+                     
+                     (:bounding-box (:? id1) (:? L1) (:? T1) (:? R1) (:? B1))
+                     (:bounding-box (:? id2) (:? L2) (:? T2) (:? R2) (:? B2))
+                     (:lisp (lisp-BoundingBoxCompletelyInside (:? L1) (:? T1) (:? R1) (:? B1)
+                                                              (:? L2) (:? T2) (:? R2) (:? B2)))
+                     )
+                    )
+                  )))
       (let ((goal `((:bounding-box-completely-inside (:? ,id1) (:? ,id2)))))
         (run-prolog self goal fb)))))
 |#
-
 
 
 (defun cl-user::htest ()
