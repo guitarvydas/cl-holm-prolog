@@ -1400,11 +1400,24 @@
                     )))
         (run-prolog nil goal fb))))
 
+
+;;;;
+;;; test left-top within bounding box
+;;;;
+;;; already handled explicitly, TODO: replace with above
+;;;;
+
+;;;;
+;;; test center within bounding box
+;;;;
+;;; already handled explicitly, TODO: replace with above
+;;;;
+
+
+
 (defun bb-in1 () (pprint (bounding-box-completely-inside :id-outer :id-inner))) ;; no
 
 (defun bb-in2 () (pprint (bounding-box-completely-inside :id-inner :id-outer)));; yes
-
-(defun bb-in3 () (pprint (bounding-box-completely-inside '(:? inner) '(:? outer)))) ;; returns all inner/outer combinations
 
 (defun cl-user::htest ()
   (htest)
@@ -1413,7 +1426,6 @@
   (pprint (negation-test2))
   (pprint (bbtest))
   (pprint (bb-in1))
-  (pprint (bb-in2))
-  (bb-in3))
+  (pprint (bb-in2)))
 
 
