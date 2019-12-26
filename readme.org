@@ -8,6 +8,8 @@
    
 ** ignoring stack overflow - it goes away if speed=3, debug=0
 ** :lisp rule added to hprolog
+** working on not, >=, <=, +, -, *, /, true, false, not-same
+
 * usage
 ** (ql:quickload :cl-holm-prolog)
 ** (in-package :hprolog)
@@ -17,4 +19,4 @@
 * branches
 ** master
 ** pt-20191224 - getting various bounding box matches to work
-
+** pt-20191226 - rel operators, math operators
