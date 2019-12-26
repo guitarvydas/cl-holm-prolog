@@ -58,12 +58,6 @@
                 (resolve y e)))
           args))
 
-(defun string-member (string-list str)
-  (mapc #'(lambda (x)
-            (when (string= x str)
-              (return-from string-member t)))
-        string-list)
-  nil)
 
 (defun prove-helper (l g r e n c complete-db result self)
   (when *trace*
@@ -78,6 +72,28 @@
     (prove-helper c (cdr g) r e n c complete-db result self))
    ((eq? :r! (car g))
     (prove-helper l (cddr g) r e n (cadr g) complete-db result self))
+
+   ((and (listp (car g))
+         (eq :lispv (caar g)))
+    (let ((lispv-clause (first g))) ; (:lispv (:? xx) (fn arg arg ...)) ... ) xx is bound to result of call (fn self arg arg ...), unless xx is _
+      (assert (= 3 (length lispv-clause))) ;; the :lispv form is badly formed if this assert fails
+      (let ((var-clause (second lispv-clause))
+            (sexpr (third lispv-clause)))
+        (when (var-in-environment-p var-clause e)
+          (error (format nil "~&cannot use same variable ~S, since it is already in the environment ~S~%" var-clause e)))      
+        (assert (and (listp var-clause)
+                     (eq :? (first var-clause))
+                     (symbolp (second var-clause))))
+        (let ((var (if (string= "_" (symbol-name (second var-clause)))
+                       :dont-care
+                     (second var-clause)))
+              (fn (first sexpr))
+              (arglist (expand-vars (rest sexpr) e)))
+          (let ((lispv-r (apply fn (append (list self) arglist))))
+            (let ((e* (if (eq :dont-care var)
+                          e
+                        (cons (list var-clause lispv-r) e))))
+              (prove-helper l (cdr g) r e* n  c complete-db result self)))))))
 
    ((and (listp (car g))
          (eq :lisp (caar g)))
@@ -188,17 +204,19 @@
 (defun unify (x y e)
   ;; return (values bindings success)
 
-  (when (and x
-             (symbolp x)
-             (not (eq x *empty*))
-             (not (eq (find-package "KEYWORD") (symbol-package x))))
-    (error (format nil "goals must use KEYWORD symbols, but got ~S" x)))
-
-  (when (and y
-             (symbolp y)
-             (not (eq y *empty*))
-             (not (eq (find-package "KEYWORD") (symbol-package y))))
-    (error (format nil "goals must use KEYWORD symbols, but got ~S" y)))
+  (unless (eq x t)
+    (when (and x
+               (symbolp x)
+               (not (eq x *empty*))
+               (not (eq (find-package "KEYWORD") (symbol-package x))))
+      (error (format nil "goals must use KEYWORD symbols, but got ~S" x))))
+    
+  (unless (eq y t)
+    (when (and y
+               (symbolp y)
+               (not (eq y *empty*))
+               (not (eq (find-package "KEYWORD") (symbol-package y))))
+      (error (format nil "goals must use KEYWORD symbols, but got ~S" y))))
 
   (let ((x (value x e))
         (y (value y e)))
@@ -249,3 +267,24 @@
                       (tail-rec-loop (cdr ee))))))
       (tail-rec-loop e))
     result))
+
+(defun string-member (string-list str)
+  (mapc #'(lambda (x)
+            (when (string= x str)
+              (return-from string-member t)))
+        string-list)
+  nil)
+
+(defun var-in-environment-p (var env)
+  (assert (listp env))
+  (assert (var? var))
+  (if (null env)
+      nil
+    (let ((first-var (caar env)))
+      (when (listp first-var)
+        (when (var? first-var)
+          (when (and (eq (name first-var) (name var))
+                     (eq (htime first-var) (htime var)))
+            (return-from var-in-environment-p t))))
+      (var-in-environment-p var (cdr env)))))
+            
