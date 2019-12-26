@@ -73,6 +73,9 @@
    ((eq? :r! (car g))
     (prove-helper l (cddr g) r e n (cadr g) complete-db result self))
 
+   ((eq :rule (car g))
+    (prove-helper l (cdr g) r e d c complete-db result self))
+
    ((and (listp (car g))
          (eq :lispv (caar g)))
     (let ((lispv-clause (first g))) ; (:lispv (:? xx) (fn arg arg ...)) ... ) xx is bound to result of call (fn self arg arg ...), unless xx is _

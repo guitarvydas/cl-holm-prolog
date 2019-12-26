@@ -1562,10 +1562,12 @@
   (let ((fb
          `(((:get-xint 3))
            ((:get-yint 1))
-           ((:is (:? x) (:? x))
+           (:rule
+            (:is (:? x) (:? x))
             :!
             )
-           ((:is (:? x) (:? y))
+           (:rule
+            (:is (:? x) (:? y))
             :!
             :fail
             )))
