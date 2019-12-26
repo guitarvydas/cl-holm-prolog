@@ -1532,7 +1532,7 @@
            ((:get-yint 1))))
         (goal '( (:get-xint (:? x))
                  (:get-yint (:? y))
-                 (:lispv (:? y) (compare (:? x) (:? y)))
+                 (:lispv (:? z) (compare (:? x) (:? y)))
                  (:lisp (printf "yes"))
                  )))
     (run-prolog nil goal fb)))
