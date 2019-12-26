@@ -1419,6 +1419,70 @@
 
 (defun bb-in2 () (pprint (bounding-box-completely-inside :id-inner :id-outer)));; yes
 
+(defun ge-test1 ()
+  (format *standard-output* "~&GE-test1~%")
+  (let ((fb
+         `(((:get-ints 1 2))))
+        (goal '( (:get-ints (:? x) (:? y)) (>= (:? x) (:? y)) )))
+    (run-prolog nil goal fb)))
+    
+(defun ge-test2 ()
+  (format *standard-output* "~&GE-test2~%")
+  (let ((fb
+         `(((:get-ints 1 2))))
+        (goal '( (:get-ints (:? x) (:? y)) (>= (:? y) (:? x)) )))
+    (run-prolog nil goal fb)))
+    
+(defun ge-test3 ()
+  (format *standard-output* "~&GE-test3~%")
+  (let ((fb
+         `(((:get-ints 1 2))
+           ((:get-ints 2 1))))
+        (goal '( (:get-ints (:? x) (:? y)) (>= (:? x) (:? y)) )))
+    (run-prolog nil goal fb)))
+    
+(defun le-test1 ()
+  (format *standard-output* "~&LE-test1~%")
+  (let ((fb
+         `(((:get-ints 1 2))))
+        (goal '( (:get-ints (:? x) (:? y)) (<= (:? x) (:? y)) )))
+    (run-prolog nil goal fb)))
+    
+(defun le-test2 ()
+  (format *standard-output* "~&LE-test2~%")
+  (let ((fb
+         `(((:get-ints 1 2))))
+        (goal '( (:get-ints (:? x) (:? y)) (<= (:? y) (:? x)) )))
+    (run-prolog nil goal fb)))
+    
+(defun G-test1 ()
+  (format *standard-output* "~&G-test1~%")
+  (let ((fb
+         `(((:Gt-ints 1 2))))
+        (goal '( (:Gt-ints (:? x) (:? y)) (> (:? x) (:? y)) )))
+    (run-prolog nil goal fb)))
+    
+(defun G-test2 ()
+  (format *standard-output* "~&G-test2~%")
+  (let ((fb
+         `(((:Gt-ints 1 2))))
+        (goal '( (:Gt-ints (:? x) (:? y)) (> (:? y) (:? x)) )))
+    (run-prolog nil goal fb)))
+    
+(defun L-test1 ()
+  (format *standard-output* "~&L-test1~%")
+  (let ((fb
+         `(((:Gt-ints 1 2))))
+        (goal '( (:Gt-ints (:? x) (:? y)) (< (:? x) (:? y)) )))
+    (run-prolog nil goal fb)))
+    
+(defun L-test2 ()
+  (format *standard-output* "~&L-test2~%")
+  (let ((fb
+         `(((:Gt-ints 1 2))))
+        (goal '( (:Gt-ints (:? x) (:? y)) (< (:? y) (:? x)) )))
+    (run-prolog nil goal fb)))
+    
 (defun cl-user::htest ()
   (htest)
   (hteste)
@@ -1426,6 +1490,13 @@
   (pprint (negation-test2))
   (pprint (bbtest))
   (pprint (bb-in1))
-  (pprint (bb-in2)))
-
-
+  (pprint (bb-in2))
+  (ge-test1)
+  (ge-test2)
+  (le-test1)
+  (le-test2)
+  (g-test1)
+  (g-test2)
+  (l-test1)
+  (l-test2)
+  (ge-test3))

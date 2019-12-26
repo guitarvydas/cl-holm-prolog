@@ -47,6 +47,24 @@
       (substitute :yes nil r))))
         
 
+(defun expand-vars (args e)
+  (mapcar #'(lambda (y)
+              (if (and (listp y) (member (car y) '(asserta retract)))
+                  (mapcar #'(lambda (x)
+                              (if (and (listp x) (eq :? (car x)))
+                                  (resolve x e)
+                                x))
+                          y)
+                (resolve y e)))
+          args))
+
+(defun string-member (string-list str)
+  (mapc #'(lambda (x)
+            (when (string= x str)
+              (return-from string-member t)))
+        string-list)
+  nil)
+
 (defun prove-helper (l g r e n c complete-db result self)
   (when *trace*
     (if g
@@ -67,21 +85,32 @@
       (assert (= 2 (length lisp-colon-clause))) ;; the :lisp form is badly formed if this assert fails
       (let ((sexpr (second lisp-colon-clause)))
         (let ((fn (first sexpr))
-              (arglist (mapcar #'(lambda (y)
-                                   (if (and (listp y) (member (car y) '(asserta retract)))
-                                     (mapcar #'(lambda (x)
-                                                 (if (and (listp x) (eq :? (car x)))
-                                                     (resolve x e)
-                                                   x))
-                                             y)
-                                     (resolve y e)))
-                               (rest sexpr))))
+              (arglist (expand-vars (rest sexpr) e)))
           (multiple-value-bind (success ll gg rr ee nn cc resultresult) 
               (apply fn (append (cons self arglist) (list l g r e n c result)))
             (declare (ignore gg))
             (if success
                 (prove-helper ll (cdr g) rr ee nn cc complete-db resultresult self)
               (back l g r e n c complete-db result self)))))))
+
+   ((and (listp (car g))    ;; g = ((op x y z) ...)
+         (not (numberp (htime g)))
+         (string-member '("NOT" ">=" "<=" ">" "<") (symbol-name (caar g))))
+    (let ((lisp (car g)))
+      (let ((op (intern (symbol-name (first lisp)) "CL"))
+            (args (expand-vars (rest lisp) e)))
+        (let ((r (apply op args)))
+          (if r
+              (prove-helper l (cdr g) r e n c complete-db result self)
+            (back l g r e n c complete-db result self))))))
+
+   ((and (listp (car g))    ;; g = (true ...)
+         (string= "TRUE" (symbol-name (caar g))))
+    (prove-helper l g r e n c complete-db result self))
+   
+   ((and (listp (car g))    ;; g = (false ...)
+         (string= "FAIL" (symbol-name (caar g))))
+    (back l g r e n c complete-db result self))
 
    ((and (listp (car g))
          (eq :traceon (caar g)))
