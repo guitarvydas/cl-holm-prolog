@@ -1482,6 +1482,61 @@
          `(((:Gt-ints 1 2))))
         (goal '( (:Gt-ints (:? x) (:? y)) (< (:? y) (:? x)) )))
     (run-prolog nil goal fb)))
+
+(defun compare (self v n)
+  (declare (ignore self))
+  (>= v n))
+
+(defun lispv-test1 ()
+  (format *standard-output* "~&lispv test1~%")
+  (let ((fb
+         `(((:get-int 3))
+           ((:fetch-int (:? x))
+            (:get-int  (:? x)))))
+        (goal '( (:fetch-int (:? x))
+                 (:lispv (:? y) (compare (:? x) 2))
+                 )))
+    (run-prolog nil goal fb)))
+    
+(defun lispv-test2 ()
+  (format *standard-output* "~&lispv test2~%")
+  (let ((fb
+         `(((:get-int 3))
+           ((:fetch-int (:? x))
+            (:get-int  (:? x)))))
+        (goal '( (:fetch-int (:? x))
+                 (:lispv (:? y) (compare (:? x) 5))
+                 )))
+    (run-prolog nil goal fb)))
+    
+(defun lispv-test3 ()
+  (format *standard-output* "~&lispv test3~%")
+  (let ((fb
+         `(((:get-int 3))
+           ((:fetch-int (:? x))
+            (:get-int  (:? x)))
+           ((:is (:? x) (:? y))
+            :!
+            :fail)
+           ((:is (:? x) (:? x)))))            
+        (goal '( (:fetch-int (:? x))
+                 (:lispv (:? y) (compare (:? x) 5))
+                 (:is (:? y) t)
+                 )))
+    (run-prolog nil goal fb)))
+
+(defun lispv-test4 ()
+  (format *standard-output* "~&lispv test4~%")
+  (let ((fb
+         `(((:get-xint 3))
+           ((:get-yint 1))))
+        (goal '( (:get-xint (:? x))
+                 (:get-yint (:? y))
+                 (:lispv (:? y) (compare (:? x) (:? y)))
+                 (:lisp (printf "yes"))
+                 )))
+    (run-prolog nil goal fb)))
+    
     
 (defun cl-user::htest ()
   (htest)
@@ -1499,4 +1554,7 @@
   (g-test2)
   (l-test1)
   (l-test2)
-  (ge-test3))
+  (lispv-test1)
+  (lispv-test2)
+  (lispv-test3)
+  (lispv-test4))
