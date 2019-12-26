@@ -1557,6 +1557,25 @@
                  )))
     (run-prolog nil goal fb)))
     
+(defun lispv-test6 ()
+  (format *standard-output* "~&lispv test6~%")
+  (let ((fb
+         `(((:get-xint 3))
+           ((:get-yint 1))
+           ((:is (:? x) (:? x))
+            :!
+            )
+           ((:is (:? x) (:? y))
+            :!
+            :fail
+            )))
+        (goal '( (:get-xint (:? x))
+                 (:get-yint (:? y))
+                 (:lispv _ (compare (:? x) (:? y)))
+                 (:lisp (printf "_ succeeded"))
+                 )))
+    (run-prolog nil goal fb)))
+    
     
 (defun cl-user::htest ()
   (htest)
@@ -1578,4 +1597,5 @@
   (lispv-test2)
   (lispv-test3)
   (lispv-test4)
-  (lispv-test5))
+  (lispv-test5)
+  (lispv-test6))

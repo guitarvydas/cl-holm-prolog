@@ -79,12 +79,11 @@
       (assert (= 3 (length lispv-clause))) ;; the :lispv form is badly formed if this assert fails
       (let ((var-clause (second lispv-clause))
             (sexpr (third lispv-clause)))
-        (when (var-in-environment-p var-clause e)
-          (error (format nil "~&cannot use same variable ~S, since it is already in the environment ~S~%" var-clause e)))      
-        (assert (and (listp var-clause)
-                     (eq :? (first var-clause))
-                     (symbolp (second var-clause))))
-        (let ((var (if (string= "_" (symbol-name (second var-clause)))
+        (if (symbolp var-clause)
+            (assert (string= "_" var-clause))
+          (when (var-in-environment-p var-clause e)
+            (error (format nil "~&cannot use same variable ~S, since it is already in the environment ~S~%" var-clause e))))
+        (let ((var (if (and (symbolp var-clause) (string= "_" (symbol-name var-clause)))
                        :dont-care
                      (second var-clause)))
               (fn (first sexpr))
