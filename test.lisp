@@ -1578,7 +1578,37 @@
                  )))
     (run-prolog nil goal fb)))
     
-    
+
+(defun forall-test1 ()
+  (format *standard-output* "~&forall~%")
+  (let ((fb '(
+         (:fact (:rect :id-outer))
+         (:fact (:bounding_box_left :id-outer 3585.0))
+         (:fact (:bounding_box_top :id-outer 450.0))
+         (:fact (:bounding_box_right :id-outer 3665.0))
+         (:fact (:bounding_box_bottom :id-outer 530.0))
+         (:fact (:rect :id-inner))
+         (:fact (:bounding_box_left :id-inner 3586.0))
+         (:fact (:bounding_box_top :id-inner 451.0))
+         (:fact (:bounding_box_right :id-inner 3664.0))
+         (:fact (:bounding_box_bottom :id-inner 529.0))
+         (:rule
+          (:bounding-box (:? id) (:? left) (:? top) (:? right) (:? bottom))
+          (:rect (:? id))
+          (:bounding_box_left (:? id) (:? left))
+          (:bounding_box_top (:? id) (:? top))
+          (:bounding_box_right (:? id) (:? right))
+          (:bounding_box_bottom (:? id) (:? bottom))
+          )
+         (:rule
+          (:find-rects (:? id) (:? left) (:? top) (:? right) (:? bottom))
+          (:rect (:? id))
+          (:bounding-box (:? id) (:? left) (:? top) (:? right) (:? bottom))
+          )
+         )))
+    (let ((goal '((:find-rects (:? id) (:? left) (:? top) (:? right) (:? bottom)))))
+      (run-prolog nil goal fb))))
+
 (defun cl-user::htest ()
   (htest)
   (hteste)
@@ -1600,4 +1630,5 @@
   (lispv-test3)
   (lispv-test4)
   (lispv-test5)
-  (lispv-test6))
+  (lispv-test6)
+  (forall-test1))

@@ -59,6 +59,12 @@
           args))
 
 
+;; a db is ( (...) (...) ... ), 
+;; each list in the db is a rule or a fact
+;; a rule is ((a) (b) (c_) where (a) is the head, ((b) (c)) is the body of the rule
+;; a fact is ((fact))
+;; a goal is ( (e) ...) where (e) is a single relation to be matched
+;; a logic variable is (:? var) 
 (defun prove-helper (l g r e n c complete-db result self)
   (when *trace*
     (if g
@@ -74,7 +80,15 @@
     (prove-helper l (cddr g) r e n (cadr g) complete-db result self))
 
    ((eq :rule (car g))
-    (prove-helper l (cdr g) r e d c complete-db result self))
+    (prove-helper l (cdr g) r e n c complete-db result self))
+
+   ((and (listp r) (listp (car r)) (or (eq :rule (caar r))
+                                       (eq :fact (caar r))))
+    ;; r = ((:rule ...) ...) --> ((...)...)
+    (prove-helper l g (cons (cdar r) (cdr r)) e n c complete-db result self))
+
+   ((eq :fact (car g))
+    (prove-helper l (cdr g) r e n c complete-db result self))
 
    ((and (listp (car g))
          (eq :lispv (caar g)))
@@ -145,12 +159,12 @@
         result
       (back l g r e n c complete-db result self)))
    (t
-    (let* ((a  (copy (car r) n)))
+    (let* ((a  (copy (car r) n))) ;; creates unique variables for (car r)
       (multiple-value-bind (e* success)
           (unify (car a) (car g) e)
         (if success
             (prove-helper (link l g r e n c)
-                   (append (cdr a) `(:r! ,l) (cdr g))
+                   (append (cdr a) `(:r! ,l) (cdr g))  ;; g gets [(cdr r') (r! ,l) (cdr g)] where (cdr r') is a copy of the body of a rule
                    complete-db ;; ! - start from top
                    e*
                    (+ 1 n)
