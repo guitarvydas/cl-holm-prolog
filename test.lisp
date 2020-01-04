@@ -1190,7 +1190,7 @@
                   (:geometry_center_y (:? id) (:? cy))
                   (:geometry_w (:? id) (:? hw))
                   (:geometry_h (:? id) (:? hh))
-                  (:lisp (asserta (:is-an-ellipse (:? id))))
+                  (:lisp-method (asserta (:is-an-ellipse (:? id))))
                   )
                 db-very-small)))
       (let ((complete-db idb)
@@ -1228,6 +1228,9 @@
             rr))))))
                   
 
+(defun out (msg)
+  (format *standard-output* "~&~A~%" msg))
+
 (defun printf (self arg l g r e n c result)
   (declare (ignore self))
   (format *standard-output* "~&printf ~S~%" arg)
@@ -1246,10 +1249,10 @@
         (top-cut nil))
     (let ((results (prove top-link '(
                                      (:bounding_box_top :id391 (:? top))
-                                     (:lisp (printf 1))
+                                     (:lisp-method (printf 1))
                                      (:bounding_box_left :id391 (:? left))
-                                     (:lisp (printf 2))
-                                     (:lisp (printit (:? top) (:? left)))
+                                     (:lisp-method (printf 2))
+                                     (:lisp-method (printit (:? top) (:? left)))
                                      )
                           initial-db top-env 1 top-cut complete-db nil *self*)))
       (format *standard-output* "~&results ~S~%" results))))
@@ -1307,8 +1310,7 @@
 
 
 
-(defun run-prolog (self goal fb)
-  (declare (ignore self))
+(defun run-prolog (goal fb)
   (let ((initial-db fb)
         (complete-db fb)
         (top-link nil) (top-env *empty*) (top-cut nil))
@@ -1346,7 +1348,7 @@
     (let ((goal '(
                   (:bounding-box (:? id) (:? left) (:? top) (:? right) (:? bottom))
                   )))
-      (run-prolog nil goal fb))))
+      (run-prolog goal fb))))
 
 ;;;;
 ;;; test bounding box within bounding box
@@ -1361,7 +1363,7 @@
    (and (>= L1 L2) (>= T1 T2) (>= R2 R1) (>= B2 B1))
    l g r e n c result))
 
-(defmethod bounding-box-completely-inside (#+nil(self e/part:part) id1 id2)
+(defmethod bounding-box-completely-inside (id1 id2)
   (let ((fb (cons rule-bounding-box
                   '(
                     ((:rect :id-outer))
@@ -1381,7 +1383,7 @@
                      (:not-same (:? id10) (:? id20))
                      (:bounding-box (:? id10) (:? L10) (:? T10) (:? R10) (:? B10))
                      (:bounding-box (:? id20) (:? L20) (:? T20) (:? R20) (:? B20))
-                     (:lisp (lisp-BoundingBoxCompletelyInside (:? L10) (:? T10) (:? R10) (:? B10)
+                     (:lisp-method (lisp-BoundingBoxCompletelyInside (:? L10) (:? T10) (:? R10) (:? B10)
                                                               (:? L20) (:? T20) (:? R20) (:? B20)))
                      )
                     ((:not-same (:? x) (:? x))
@@ -1393,12 +1395,12 @@
                   )))
       (let ((goal `(
                     (:bounding-box-completely-inside ,id1  ,id2)
-                    (:lisp (printf ""))
-                    (:lisp (printf ,id1))
-                    (:lisp (printf ,id2))
-                    (:lisp (printf "yes"))
+                    (:lisp-method (printf ""))
+                    (:lisp-method (printf ,id1))
+                    (:lisp-method (printf ,id2))
+                    (:lisp-method (printf "yes"))
                     )))
-        (run-prolog nil goal fb))))
+        (run-prolog goal fb))))
 
 
 ;;;;
@@ -1420,75 +1422,65 @@
 (defun bb-in2 () (pprint (bounding-box-completely-inside :id-inner :id-outer)));; yes
 
 (defun ge-test1 ()
-  (format *standard-output* "~&GE-test1~%")
   (let ((fb
          `(((:get-ints 1 2))))
         (goal '( (:get-ints (:? x) (:? y)) (>= (:? x) (:? y)) )))
-    (run-prolog nil goal fb)))
+    (run-prolog goal fb)))
     
 (defun ge-test2 ()
-  (format *standard-output* "~&GE-test2~%")
   (let ((fb
          `(((:get-ints 1 2))))
         (goal '( (:get-ints (:? x) (:? y)) (>= (:? y) (:? x)) )))
-    (run-prolog nil goal fb)))
+    (run-prolog goal fb)))
     
 (defun ge-test3 ()
-  (format *standard-output* "~&GE-test3~%")
   (let ((fb
          `(((:get-ints 1 2))
            ((:get-ints 2 1))))
         (goal '( (:get-ints (:? x) (:? y)) (>= (:? x) (:? y)) )))
-    (run-prolog nil goal fb)))
+    (run-prolog goal fb)))
     
 (defun le-test1 ()
-  (format *standard-output* "~&LE-test1~%")
   (let ((fb
          `(((:get-ints 1 2))))
         (goal '( (:get-ints (:? x) (:? y)) (<= (:? x) (:? y)) )))
-    (run-prolog nil goal fb)))
+    (run-prolog goal fb)))
     
 (defun le-test2 ()
-  (format *standard-output* "~&LE-test2~%")
   (let ((fb
          `(((:get-ints 1 2))))
         (goal '( (:get-ints (:? x) (:? y)) (<= (:? y) (:? x)) )))
-    (run-prolog nil goal fb)))
+    (run-prolog goal fb)))
     
 (defun G-test1 ()
-  (format *standard-output* "~&G-test1~%")
   (let ((fb
          `(((:Gt-ints 1 2))))
         (goal '( (:Gt-ints (:? x) (:? y)) (> (:? x) (:? y)) )))
-    (run-prolog nil goal fb)))
+    (run-prolog goal fb)))
     
 (defun G-test2 ()
-  (format *standard-output* "~&G-test2~%")
   (let ((fb
          `(((:Gt-ints 1 2))))
         (goal '( (:Gt-ints (:? x) (:? y)) (> (:? y) (:? x)) )))
-    (run-prolog nil goal fb)))
+    (run-prolog goal fb)))
     
 (defun L-test1 ()
-  (format *standard-output* "~&L-test1~%")
   (let ((fb
          `(((:Gt-ints 1 2))))
         (goal '( (:Gt-ints (:? x) (:? y)) (< (:? x) (:? y)) )))
-    (run-prolog nil goal fb)))
+    (run-prolog goal fb)))
     
 (defun L-test2 ()
-  (format *standard-output* "~&L-test2~%")
   (let ((fb
          `(((:Gt-ints 1 2))))
         (goal '( (:Gt-ints (:? x) (:? y)) (< (:? y) (:? x)) )))
-    (run-prolog nil goal fb)))
+    (run-prolog goal fb)))
 
 (defun compare (self v n)
   (declare (ignore self))
   (>= v n))
 
 (defun lispv-test1 ()
-  (format *standard-output* "~&lispv test1~%")
   (let ((fb
          `(((:get-int 3))
            ((:fetch-int (:? x))
@@ -1496,10 +1488,9 @@
         (goal '( (:fetch-int (:? x))
                  (:lispv (:? y) (compare (:? x) 2))
                  )))
-    (run-prolog nil goal fb)))
+    (run-prolog goal fb)))
     
 (defun lispv-test2 ()
-  (format *standard-output* "~&lispv test2~%")
   (let ((fb
          `(((:get-int 3))
            ((:fetch-int (:? x))
@@ -1507,10 +1498,9 @@
         (goal '( (:fetch-int (:? x))
                  (:lispv (:? y) (compare (:? x) 5))
                  )))
-    (run-prolog nil goal fb)))
+    (run-prolog goal fb)))
     
 (defun lispv-test3 ()
-  (format *standard-output* "~&lispv test3~%")
   (let ((fb
          `(((:get-int 3))
            ((:fetch-int (:? x))
@@ -1523,7 +1513,7 @@
                  (:lispv (:? y) (compare (:? x) 5))
                  (:is (:? y) t)
                  )))
-    (run-prolog nil goal fb)))
+    (run-prolog goal fb)))
 
 (defun lispv-test4 ()
   (format *standard-output* "~&lispv test4~%")
@@ -1533,12 +1523,11 @@
         (goal '( (:get-xint (:? x))
                  (:get-yint (:? y))
                  (:lispv (:? z) (compare (:? x) (:? y)))
-                 (:lisp (printf "yes"))
+                 (:lisp-method (printf "yes"))
                  )))
-    (run-prolog nil goal fb)))
+    (run-prolog goal fb)))
 
 (defun lispv-test5 ()
-  (format *standard-output* "~&lispv test5~%")
   (let ((fb
          `(((:get-xint 3))
            ((:get-yint 1))
@@ -1553,9 +1542,9 @@
                  (:get-yint (:? y))
                  (:lispv (:? z) (compare (:? x) (:? y)))
                  (:is (:? z) t)
-                 (:lisp (printf "yes"))
+                 (:lisp-method (printf "yes"))
                  )))
-    (run-prolog nil goal fb)))
+    (run-prolog goal fb)))
     
 (defun lispv-test6 ()
   (format *standard-output* "~&lispv test6~%")
@@ -1574,13 +1563,12 @@
         (goal '( (:get-xint (:? x))
                  (:get-yint (:? y))
                  (:lispv _ (compare (:? x) (:? y)))
-                 (:lisp (printf "_ succeeded"))
+                 (:lisp-method (printf "_ succeeded"))
                  )))
-    (run-prolog nil goal fb)))
+    (run-prolog goal fb)))
     
 
 (defun forall-test1 ()
-  (format *standard-output* "~&forall~%")
   (let ((fb '(
          (:fact (:rect :id-outer))
          (:fact (:bounding_box_left :id-outer 3585.0))
@@ -1607,28 +1595,73 @@
           )
          )))
     (let ((goal '((:find-rects (:? id) (:? left) (:? top) (:? right) (:? bottom)))))
-      (run-prolog nil goal fb))))
+      (run-prolog goal fb))))
+
+(defun lisp-test7 ()
+  (let ((fb
+         `(((:get-xint 3))
+           ((:get-yint 1))
+           (:rule
+            (:is (:? x) (:? x))
+            :!
+            )
+           (:rule
+            (:is (:? x) (:? y))
+            :!
+            :fail
+            )))
+        (goal '((:trace-on 2)
+                (:get-xint (:? x))
+                (:get-yint (:? y))
+                (:lisp (< (:? x) (:? y)))
+                (:lisp (out "_ succeeded"))
+                )))
+    (run-prolog goal fb)))
 
 (defun cl-user::htest ()
+  (format *standard-output* "~&htest~%~%")
   (htest)
+  (format *standard-output* "~&hteste~%~%")
   (hteste)
+  (format *standard-output* "~&negation-test1~%~%")
   (pprint (negation-test1))
+  (format *standard-output* "~&negation-test12~%~%")
   (pprint (negation-test2))
+  (format *standard-output* "~&bbtest~%~%")
   (pprint (bbtest))
+  (format *standard-output* "~&bb-in1~%~%")
   (pprint (bb-in1))
+  (format *standard-output* "~&bb-in2~%~%")
   (pprint (bb-in2))
+  (format *standard-output* "~&ge-test1~%~%")
   (ge-test1)
+  (format *standard-output* "~&ge-test2~%~%")
   (ge-test2)
+  (format *standard-output* "~&le-test1~%~%")
   (le-test1)
+  (format *standard-output* "~&le-test2~%~%")
   (le-test2)
+  (format *standard-output* "~&G-test1~%~%")
   (g-test1)
+  (format *standard-output* "~&G-test2~%~%")
   (g-test2)
+  (format *standard-output* "~&l-test1~%~%")
   (l-test1)
+  (format *standard-output* "~&l-test2~%~%")
   (l-test2)
+  (format *standard-output* "~&lispv-test1~%~%")
   (lispv-test1)
+  (format *standard-output* "~&lispv-test2~%~%")
   (lispv-test2)
+  (format *standard-output* "~&lispv-test3~%~%")
   (lispv-test3)
+  (format *standard-output* "~&lispv-test4~%~%")
   (lispv-test4)
+  (format *standard-output* "~&lispv-test5~%~%")
   (lispv-test5)
+  (format *standard-output* "~&lispv-test6~%~%")
   (lispv-test6)
-  (forall-test1))
+  (format *standard-output* "~&forall-test1~%~%")
+  (forall-test1)
+  (format *standard-output* "~&lispv test7 tracing & :lisp~%~%")
+  (lisp-test7))

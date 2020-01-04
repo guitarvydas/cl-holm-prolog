@@ -30,10 +30,6 @@
   ;(set-car! (cddr x) '(())))
 
 (defun back (l g r e n c complete-db result self)
-  (when *trace*
-    (if g
-        (format *standard-output* "~&back  (car g) = ~S~%" (car g))
-      (format *standard-output* "~&back g = NIL~%")))
   (cond
    ((and (pair? g)
          (pair? r))
@@ -61,17 +57,16 @@
 
 ;; a db is ( (...) (...) ... ), 
 ;; each list in the db is a rule or a fact
-;; a rule is ((a) (b) (c_) where (a) is the head, ((b) (c)) is the body of the rule
+;; a rule is ((a) (b) (c)) where (a) is the head, ((b) (c)) is the body of the rule
 ;; a fact is ((fact))
 ;; a goal is ( (e) ...) where (e) is a single relation to be matched
 ;; a logic variable is (:? var) 
 (defun prove-helper (l g r e n c complete-db result self)
-  (when *trace*
-    (if g
-        (format *standard-output* "~&prove (car g) = ~S~%" (car g))
-      (format *standard-output* "~&prove g = NIL~%")))
   (cond
    ((null? g)
+    (when *trace*
+      (if g
+          (format *standard-output* "~&prove SUCESS~%" (car g))))
     (back l g r e n c complete-db (cons (collect-frame e) result) self))
    ((eq? :! (car g))
     (clear_r c)
@@ -112,7 +107,17 @@
               (prove-helper l (cdr g) r e* n  c complete-db result self)))))))
 
    ((and (listp (car g))
-         (eq :lisp (caar g)))
+         (eq :lisp (caar g))) ;; call LISP, always succeed
+    (let ((lisp-colon-clause (first g))) ; (:lisp (fn arg arg ...))
+      (assert (= 2 (length lisp-colon-clause))) ;; the :lisp form is badly formed if this assert fails
+      (let ((sexpr (second lisp-colon-clause)))
+        (let ((fn (first sexpr))
+              (arglist (expand-vars (rest sexpr) e)))
+          (apply fn arglist)
+          (prove-helper l (cdr g) r e n c complete-db result self)))))
+
+   ((and (listp (car g))
+         (eq :lisp-method (caar g))) ;; call a LISP METHOD with SELF, success depends on method return value
     (let ((lisp-colon-clause (first g))) ; (:lisp (fn arg arg ...))
       (assert (= 2 (length lisp-colon-clause))) ;; the :lisp form is badly formed if this assert fails
       (let ((sexpr (second lisp-colon-clause)))
@@ -145,13 +150,18 @@
     (back l g r e n c complete-db result self))
 
    ((and (listp (car g))
-         (eq :traceon (caar g)))
-    (setf *trace* t)
-    (prove-helper l (cdr g) r e n c complete-db result self))
+         (eq :trace-on (caar g)))
+    (let ((level (if (numberp (second g))
+                     (second g)
+                   1)))
+      (setf *trace* level)
+      (format *standard-output* "~&TRACE ~A~%" *trace*)
+      (prove-helper l (cdr g) r e n c complete-db result self)))
 
    ((and (listp (car g))
-         (eq :traceoff (caar g)))
+         (eq :trace-off (caar g)))
     (setf *trace* nil)
+    (format *standard-output* "~&TRACE ~A~%" *trace*) 
     (prove-helper l (cdr g) r e n c complete-db result self))
 
    ((null? r)
@@ -163,16 +173,27 @@
       (multiple-value-bind (e* success)
           (unify (car a) (car g) e)
         (if success
-            (prove-helper (link l g r e n c)
-                   (append (cdr a) `(:r! ,l) (cdr g))  ;; g gets [(cdr r') (r! ,l) (cdr g)] where (cdr r') is a copy of the body of a rule
-                   complete-db ;; ! - start from top
-                   e*
-                   (+ 1 n)
-                   l
-                   complete-db
-                   result
-                   self)
-          (back l g r e n c complete-db result self)))))))
+            (progn
+              (when *trace*
+                (format *standard-output* "~&Unify success~%"))
+              (when (and (numberp *trace*) (> *trace* 1))
+                (format *standard-output* "~&Unified ~S ~S~%" (car a) (car g)))
+              (let ((next-goal (append (cdr a) `(:r! ,l) (cdr g)))) ;; g gets [(cdr r') (r! ,l) (cdr g)] where (cdr r') is a copy of the body of a rule
+                (when *trace*
+                  (format *standard-output* "~&next goal ~S~%" (car next-goal)))
+                (prove-helper (link l g r e n c)
+                              next-goal
+                              complete-db ;; ! - start from top
+                              e*
+                              (+ 1 n)
+                              l
+                              complete-db
+                              result
+                              self)))
+          (progn
+            (when *trace*
+              (format *standard-output* "."))
+            (back l g r e n c complete-db result self))))))))
 
 
 (defparameter *empty* '((:bottom)))
@@ -245,7 +266,6 @@
      (t
       (multiple-value-bind (e* success)
           (unify (car x) (car y) e)
-        #+nil(format *standard-output* "~&unify e*/success ~S ~S~%" e* success)
         (if success
             (multiple-value-bind (ee* success2)
                 (unify (cdr x) (cdr y) e*)
