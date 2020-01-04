@@ -180,7 +180,7 @@
             (progn
               (when *trace*
                 (format *standard-output* "~&Unify success~%"))
-              (when (> *trace* 1)
+              (when (and (numberp *trace*) (> *trace* 1))
                 (format *standard-output* "~&Unified ~S ~S~%" (car a) (car g)))
               (let ((next-goal (append (cdr a) `(:r! ,l) (cdr g)))) ;; g gets [(cdr r') (r! ,l) (cdr g)] where (cdr r') is a copy of the body of a rule
                 (when *trace*
