@@ -30,10 +30,6 @@
   ;(set-car! (cddr x) '(())))
 
 (defun back (l g r e n c complete-db result self)
-  (when *trace*
-    (if g
-        (format *standard-output* "~&back  (car g) = ~S~%" (car g))
-      (format *standard-output* "~&back g = NIL~%")))
   (cond
    ((and (pair? g)
          (pair? r))
