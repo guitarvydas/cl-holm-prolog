@@ -107,7 +107,7 @@
               (prove-helper l (cdr g) r e* n  c complete-db result self)))))))
 
    ((and (listp (car g))
-         (eq :lisp (caar g))) ;; call LISP, always succeed
+         (eq :lisp (caar g))) ;; call LISP, always succeed, args are NOT eval'ed (e.g. (:lisp (format *standard-output* ...)) does not work)
     (let ((lisp-colon-clause (first g))) ; (:lisp (fn arg arg ...))
       (assert (= 2 (length lisp-colon-clause))) ;; the :lisp form is badly formed if this assert fails
       (let ((sexpr (second lisp-colon-clause)))
