@@ -79,7 +79,6 @@
       (if g
 	  (tab-in *standard-output* depth)
           (format *standard-output* "prove SUCESS~%" (car g))))
-    (format *standard-output* "~&depth=~A~%" depth)
     (back l g r e n c (dec-depth depth) complete-db (cons (collect-frame e) result) self))
    ((eq? :! (car g))
     (clear_r c)
