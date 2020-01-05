@@ -196,7 +196,7 @@
                               e*
                               (+ 1 n)
                               l
-                              (1+ depth)
+                              depth
                               complete-db
                               result
                               self)))
