@@ -78,7 +78,7 @@
     (when (trace-p)
       (if g
 	  (tab-in *standard-output* depth)
-          (format *standard-output* "prove SUCESS~%" (car g))))
+          (format *standard-output* "prove SUCCESS~%" (car g))))
     (back l g r e n c (dec-depth depth) complete-db (cons (collect-frame e) result) self))
    ((eq? :! (car g))
     (clear_r c)
@@ -124,6 +124,19 @@
               (arglist (expand-vars (rest sexpr) e)))
           (apply fn arglist)
           (prove-helper l (cdr g) r e n c depth complete-db result self)))))
+
+   ((and (listp (car g))
+         (eq :lisp-true-fail (caar g))) ;; call LISP, lisp returns NIL or T which maps to :fail and :true paths
+    (let ((lisp-colon-clause (first g))) ; (:lisp (fn arg arg ...))
+      (assert (= 2 (length lisp-colon-clause))) ;; the :lisp form is badly formed if this assert fails
+      (let ((sexpr (second lisp-colon-clause)))
+        (let ((fn (first sexpr))
+              (arglist (expand-vars (rest sexpr) e)))
+          (let ((val (apply fn arglist)))
+            (if val
+                (prove-helper l (cdr g) r e n c depth complete-db result self)
+              (back l g r e n c depth complete-db result self)))))))
+      
 
    ((and (listp (car g))
          (eq :lisp-method (caar g))) ;; call a LISP METHOD with SELF, success depends on method return value
