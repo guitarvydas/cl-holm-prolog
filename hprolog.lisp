@@ -29,16 +29,16 @@
   (rplaca (cddr x) '(())))
   ;(set-car! (cddr x) '(())))
 
-(defun back (l g r e n c complete-db result self)
+(defun back (l g r e n c complete-db result self tab)
   (cond
    ((and (pair? g)
          (pair? r))
-    (prove-helper l g (cdr r) e n c complete-db result self))
+    (prove-helper l g (cdr r) e n c complete-db result self (1- tab)))
    ((pair? l)
-    (prove-helper (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l) complete-db result self))))
+    (prove-helper (L_l l) (L_g l) (cdr (L_r l)) (L_e l) (L_n l) (L_c l) complete-db result self (1- tab)))))
 
 (defun prove (l g r e n c complete-db result self)
-  (let ((r (prove-helper l g r e n c complete-db result self)))
+  (let ((r (prove-helper l g r e n c complete-db result self 0)))
     (unless (null r)
       (substitute :yes nil r))))
         
@@ -61,29 +61,29 @@
 ;; a fact is ((fact))
 ;; a goal is ( (e) ...) where (e) is a single relation to be matched
 ;; a logic variable is (:? var) 
-(defun prove-helper (l g r e n c complete-db result self)
+(defun prove-helper (l g r e n c complete-db result self tab)
   (cond
    ((null? g)
     (when (trace-p)
       (if g
           (format *standard-output* "~&prove SUCESS~%" (car g))))
-    (back l g r e n c complete-db (cons (collect-frame e) result) self))
+    (back l g r e n c complete-db (cons (collect-frame e) result) self tab))
    ((eq? :! (car g))
     (clear_r c)
-    (prove-helper c (cdr g) r e n c complete-db result self))
+    (prove-helper c (cdr g) r e n c complete-db result self tab))
    ((eq? :r! (car g))
-    (prove-helper l (cddr g) r e n (cadr g) complete-db result self))
+    (prove-helper l (cddr g) r e n (cadr g) complete-db result self tab))
 
    ((eq :rule (car g))
-    (prove-helper l (cdr g) r e n c complete-db result self))
+    (prove-helper l (cdr g) r e n c complete-db result self tab))
 
    ((and (listp r) (listp (car r)) (or (eq :rule (caar r))
                                        (eq :fact (caar r))))
     ;; r = ((:rule ...) ...) --> ((...)...)
-    (prove-helper l g (cons (cdar r) (cdr r)) e n c complete-db result self))
+    (prove-helper l g (cons (cdar r) (cdr r)) e n c complete-db result self tab))
 
    ((eq :fact (car g))
-    (prove-helper l (cdr g) r e n c complete-db result self))
+    (prove-helper l (cdr g) r e n c complete-db result self tab))
 
    ((and (listp (car g))
          (eq :lispv (caar g)))
@@ -104,7 +104,7 @@
             (let ((e* (if (eq :dont-care var)
                           e
                         (cons (list var-clause lispv-r) e))))
-              (prove-helper l (cdr g) r e* n  c complete-db result self)))))))
+              (prove-helper l (cdr g) r e* n  c complete-db result self tab)))))))
 
    ((and (listp (car g))
          (eq :lisp (caar g))) ;; call LISP, always succeed, args are NOT eval'ed (e.g. (:lisp (format *standard-output* ...)) does not work)
@@ -114,7 +114,7 @@
         (let ((fn (first sexpr))
               (arglist (expand-vars (rest sexpr) e)))
           (apply fn arglist)
-          (prove-helper l (cdr g) r e n c complete-db result self)))))
+          (prove-helper l (cdr g) r e n c complete-db result self tab)))))
 
    ((and (listp (car g))
          (eq :lisp-method (caar g))) ;; call a LISP METHOD with SELF, success depends on method return value
@@ -127,8 +127,8 @@
               (apply fn (append (cons self arglist) (list l g r e n c result)))
             (declare (ignore gg))
             (if success
-                (prove-helper ll (cdr g) rr ee nn cc complete-db resultresult self)
-              (back l g r e n c complete-db result self)))))))
+                (prove-helper ll (cdr g) rr ee nn cc complete-db resultresult self tab)
+              (back l g r e n c complete-db result self tab)))))))
 
    ((and (listp (car g))    ;; g = ((op x y z) ...)
          (not (numberp (htime g)))
@@ -138,16 +138,16 @@
             (args (expand-vars (rest lisp) e)))
         (let ((r (apply op args)))
           (if r
-              (prove-helper l (cdr g) r e n c complete-db result self)
-            (back l g r e n c complete-db result self))))))
+              (prove-helper l (cdr g) r e n c complete-db result self tab)
+            (back l g r e n c complete-db result self tab))))))
 
    ((and (listp (car g))    ;; g = (true ...)
          (string= "TRUE" (symbol-name (caar g))))
-    (prove-helper l g r e n c complete-db result self))
+    (prove-helper l g r e n c complete-db result self tab))
    
    ((and (listp (car g))    ;; g = (false ...)
          (string= "FAIL" (symbol-name (caar g))))
-    (back l g r e n c complete-db result self))
+    (back l g r e n c complete-db result self tab))
 
    ((and (listp (car g))
          (eq :trace-on (caar g)))
@@ -156,18 +156,18 @@
                    1)))
       (setf *trace* level)
       (format *standard-output* "~&TRACE ~A~%" *trace*)
-      (prove-helper l (cdr g) r e n c complete-db result self)))
+      (prove-helper l (cdr g) r e n c complete-db result self tab)))
 
    ((and (listp (car g))
          (eq :trace-off (caar g)))
     (setf *trace* nil)
     (format *standard-output* "~&TRACE ~A~%" *trace*) 
-    (prove-helper l (cdr g) r e n c complete-db result self))
+    (prove-helper l (cdr g) r e n c complete-db result self tab))
 
    ((null? r)
     (if (null? l)
         result
-      (back l g r e n c complete-db result self)))
+      (back l g r e n c complete-db result self tab)))
    (t
     (let* ((a  (copy (car r) n))) ;; creates unique variables for (car r)
       (multiple-value-bind (e* success)
@@ -189,13 +189,14 @@
                               l
                               complete-db
                               result
-                              self)))
+                              self
+			      (1+ tab))))
           (progn
             (when (trace-verbose-p)
               (format *standard-output* "."))
             (when (trace-failure-p)
               (format *standard-output* "failed to unify /~S/ /~S/~%" (car a) (car g)))
-            (back l g r e n c complete-db result self))))))))
+            (back l g r e n c complete-db result self tab))))))))
 
 (defun trace-failure-p ()
   (and (numberp *trace*)
