@@ -79,6 +79,7 @@
       (if g
 	  (tab-in *standard-output* depth)
           (format *standard-output* "prove SUCESS~%" (car g))))
+    (format *standard-output* "~&depth=~A~%" depth)
     (back l g r e n c (dec-depth depth) complete-db (cons (collect-frame e) result) self))
    ((eq? :! (car g))
     (clear_r c)
@@ -190,23 +191,26 @@
                 (when (trace-verbose-p)
 		  (tab-in *standard-output* depth)
                   (format *standard-output* "next goal ~S~%" (car next-goal)))
-                (prove-helper (link l g r e n c depth)
-                              next-goal
-                              complete-db ;; ! - start from top
-                              e*
-                              (+ 1 n)
-                              l
-                              depth
-                              complete-db
-                              result
-                              self)))
-          (progn
-            (when (trace-verbose-p)
-              (format *standard-output* "."))
-            (when (trace-failure-p)
-	      (tab-in *standard-output* depth)
-              (format *standard-output* "failed to unify /~S/ /~S/~%" (car a) (car g)))
-            (back l g r e n c depth complete-db result self))))))))
+                (let ((calling-subr-p (not (null (cdr a)))))
+                  (prove-helper (link l g r e n c depth)
+                                next-goal
+                                complete-db ;; ! - start from top
+                                e*
+                                (+ 1 n)
+                                l
+                                (if calling-subr-p
+                                    (1+ depth)
+                                  depth)
+                                complete-db
+                                result
+                                self))))
+              (progn
+                (when (trace-verbose-p)
+                  (format *standard-output* "."))
+                (when (trace-failure-p)
+                  (tab-in *standard-output* depth)
+                  (format *standard-output* "failed to unify /~S/ /~S/~%" (car a) (car g)))
+                (back l g r e n c depth complete-db result self))))))))
 
 (defun trace-failure-p ()
   (and (numberp *trace*)
