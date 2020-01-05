@@ -338,3 +338,10 @@
             (return-from var-in-environment-p t))))
       (var-in-environment-p var (cdr env)))))
             
+
+(defun tab-in (stream n)
+  (format stream "~&")
+  (@:loop
+    (@:exit-when (<= n 0))
+    (format stream " ")
+    (decf n)))
