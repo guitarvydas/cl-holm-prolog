@@ -66,7 +66,8 @@
    ((null? g)
     (when (trace-p)
       (if g
-          (format *standard-output* "~&prove SUCESS~%" (car g))))
+	  (tab-in *standard-output* tab)
+          (format *standard-output* "prove SUCESS~%" (car g))))
     (back l g r e n c complete-db (cons (collect-frame e) result) self tab))
    ((eq? :! (car g))
     (clear_r c)
@@ -174,13 +175,13 @@
           (unify (car a) (car g) e)
         (if success
             (progn
-              (when (trace-verbose-p)
-                (format *standard-output* "~&Unify success~%"))
               (when (trace-p)
-                (format *standard-output* "~&Unified ~S ~S~%" (car a) (car g)))
+		(tab-in *standard-output* tab)
+                (format *standard-output* "Unified ~S ~S~%" (car a) (car g)))
               (let ((next-goal (append (cdr a) `(:r! ,l) (cdr g)))) ;; g gets [(cdr r') (r! ,l) (cdr g)] where (cdr r') is a copy of the body of a rule
                 (when (trace-verbose-p)
-                  (format *standard-output* "~&next goal ~S~%" (car next-goal)))
+		  (tab-in *standard-output* tab)
+                  (format *standard-output* "next goal ~S~%" (car next-goal)))
                 (prove-helper (link l g r e n c)
                               next-goal
                               complete-db ;; ! - start from top
@@ -195,6 +196,7 @@
             (when (trace-verbose-p)
               (format *standard-output* "."))
             (when (trace-failure-p)
+	      (tab-in *standard-output* tab)
               (format *standard-output* "failed to unify /~S/ /~S/~%" (car a) (car g)))
             (back l g r e n c complete-db result self tab))))))))
 
