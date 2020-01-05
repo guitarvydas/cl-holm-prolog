@@ -190,13 +190,13 @@
                 (when (trace-verbose-p)
 		  (tab-in *standard-output* depth)
                   (format *standard-output* "next goal ~S~%" (car next-goal)))
-                (prove-helper (link l g r e n c)
+                (prove-helper (link l g r e n c depth)
                               next-goal
                               complete-db ;; ! - start from top
                               e*
                               (+ 1 n)
                               l
-			      (1+ depth)
+                              (1+ depth)
                               complete-db
                               result
                               self)))

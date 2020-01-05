@@ -1637,7 +1637,7 @@
                 )))
     (run-prolog goal fb)))
 
-(defun lisp-test7 ()
+(defun test8 ()
   (let ((fb
          `(((:get-xint 3))
            ((:get-yint 1))
@@ -1703,7 +1703,7 @@
   (lispv-test6)
   (format *standard-output* "~&forall-test1~%~%")
   (forall-test1)
-  (format *standard-output* "~&lispv test7 tracing & :lisp~%~%")
+  (format *standard-output* "~&lisp test7 tracing & :lisp~%~%")
   (lisp-test7)
-  (format *standard-output* "~&lispv test8 trace 3 & :lisp~%~%")
-  (lisp-test8))
+  (format *standard-output* "~&test8 trace 3 & :lisp~%~%")
+  (test8))
