@@ -64,7 +64,7 @@
 (defun prove-helper (l g r e n c complete-db result self)
   (cond
    ((null? g)
-    (when *trace*
+    (when (trace-p)
       (if g
           (format *standard-output* "~&prove SUCESS~%" (car g))))
     (back l g r e n c complete-db (cons (collect-frame e) result) self))
@@ -151,8 +151,8 @@
 
    ((and (listp (car g))
          (eq :trace-on (caar g)))
-    (let ((level (if (numberp (second g))
-                     (second g)
+    (let ((level (if (numberp (second (first g)))
+                     (second (first g))
                    1)))
       (setf *trace* level)
       (format *standard-output* "~&TRACE ~A~%" *trace*)
@@ -174,12 +174,12 @@
           (unify (car a) (car g) e)
         (if success
             (progn
-              (when *trace*
+              (when (trace-verbose-p)
                 (format *standard-output* "~&Unify success~%"))
-              (when (and (numberp *trace*) (> *trace* 1))
+              (when (trace-p)
                 (format *standard-output* "~&Unified ~S ~S~%" (car a) (car g)))
               (let ((next-goal (append (cdr a) `(:r! ,l) (cdr g)))) ;; g gets [(cdr r') (r! ,l) (cdr g)] where (cdr r') is a copy of the body of a rule
-                (when *trace*
+                (when (trace-verbose-p)
                   (format *standard-output* "~&next goal ~S~%" (car next-goal)))
                 (prove-helper (link l g r e n c)
                               next-goal
@@ -191,9 +191,23 @@
                               result
                               self)))
           (progn
-            (when *trace*
+            (when (trace-verbose-p)
               (format *standard-output* "."))
+            (when (trace-failure-p)
+              (format *standard-output* "failed to unify /~S/ /~S/~%" (car a) (car g)))
             (back l g r e n c complete-db result self))))))))
+
+(defun trace-failure-p ()
+  (and (numberp *trace*)
+       (> *trace* 2)))
+
+(defun trace-verbose-p ()
+  (and (numberp *trace*)
+       (> *trace* 1)))
+
+(defun trace-p ()
+  (and (numberp *trace*)
+       (> *trace* 0)))
 
 
 (defparameter *empty* '((:bottom)))

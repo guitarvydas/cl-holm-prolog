@@ -1616,6 +1616,46 @@
                 (:lisp (< (:? x) (:? y)))
                 (:lisp (out "_ succeeded"))
                 )))
+    (run-prolog goal fb)))(defun lisp-test7 ()
+  (let ((fb
+         `(((:get-xint 3))
+           ((:get-yint 1))
+           (:rule
+            (:is (:? x) (:? x))
+            :!
+            )
+           (:rule
+            (:is (:? x) (:? y))
+            :!
+            :fail
+            )))
+        (goal '((:trace-on 2)
+                (:get-xint (:? x))
+                (:get-yint (:? y))
+                (:lisp (< (:? x) (:? y)))
+                (:lisp (out "_ succeeded"))
+                )))
+    (run-prolog goal fb)))
+
+(defun lisp-test7 ()
+  (let ((fb
+         `(((:get-xint 3))
+           ((:get-yint 1))
+           (:rule
+            (:is (:? x) (:? x))
+            :!
+            )
+           (:rule
+            (:is (:? x) (:? y))
+            :!
+            :fail
+            )))
+        (goal '((:trace-on 3)
+                (:get-xint (:? x))
+                (:get-yint (:? y))
+                (:lisp (< (:? x) (:? y)))
+                (:lisp (out "_ succeeded"))
+                )))
     (run-prolog goal fb)))
 
 (defun cl-user::htest ()
@@ -1664,4 +1704,6 @@
   (format *standard-output* "~&forall-test1~%~%")
   (forall-test1)
   (format *standard-output* "~&lispv test7 tracing & :lisp~%~%")
-  (lisp-test7))
+  (lisp-test7)
+  (format *standard-output* "~&lispv test8 trace 3 & :lisp~%~%")
+  (lisp-test8))
