@@ -15,6 +15,7 @@
 (defun display (x) (format *standard-output* "~A" x))
 
 
+#|
 (defmacro link (&rest x) `(list ,@x))
 (defmacro L_l (x) `(car ,x))
 (defmacro L_g (x) `(cadr ,x))
@@ -23,6 +24,15 @@
 (defmacro L_n (x) `(car (cddddr ,x)))
 
 (defun L_c (x) (cadr (cddddr x)))
+|#
+
+(defmacro link (&rest x) `(list ,@x))
+(defmacro L_l (x) `(first ,x))
+(defmacro L_g (x) `(second ,x))
+(defmacro L_r (x) `(third ,x))
+(defmacro L_e (x) `(fourth ,x))
+(defmacro L_n (x) `(fifth ,x))
+(defmacro L_c (x) `(sixth ,x))
 
 
 (defun clear_r (x)
