@@ -109,7 +109,7 @@
                      (second var-clause)))
               (fn (first sexpr))
               (arglist (expand-vars (rest sexpr) e)))
-          (let ((lispv-r (apply fn (append (list self) arglist))))
+          (let ((lispv-r (apply fn arglist)))
             (let ((e* (if (eq :dont-care var)
                           e
                         (cons (list var-clause lispv-r) e))))
@@ -117,11 +117,14 @@
 
    ((and (listp (car g))
          (eq :lisp (caar g))) ;; call LISP, always succeed, args are NOT eval'ed (e.g. (:lisp (format *standard-output* ...)) does not work)
+;(format *standard-output* "~&(car g) ~S e=~S~%" (car g) e)  
     (let ((lisp-colon-clause (first g))) ; (:lisp (fn arg arg ...))
+;(format *standard-output* "~&lisp-colon-clause ~S~%" lisp-colon-clause)          
       (assert (= 2 (length lisp-colon-clause))) ;; the :lisp form is badly formed if this assert fails
       (let ((sexpr (second lisp-colon-clause)))
         (let ((fn (first sexpr))
               (arglist (expand-vars (rest sexpr) e)))
+;(format *standard-output* "~&sexpr=~S fn=~S arglist=~S~%" sexpr fn arglist)          
           (apply fn arglist)
           (prove-helper l (cdr g) r e n c depth complete-db result self)))))
 
