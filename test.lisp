@@ -1616,25 +1616,6 @@
                 (:lisp (< (:? x) (:? y)))
                 (:lisp (out "_ succeeded"))
                 )))
-    (run-prolog goal fb)))(defun lisp-test7 ()
-  (let ((fb
-         `(((:get-xint 3))
-           ((:get-yint 1))
-           (:rule
-            (:is (:? x) (:? x))
-            :!
-            )
-           (:rule
-            (:is (:? x) (:? y))
-            :!
-            :fail
-            )))
-        (goal '((:trace-on 2)
-                (:get-xint (:? x))
-                (:get-yint (:? y))
-                (:lisp (< (:? x) (:? y)))
-                (:lisp (out "_ succeeded"))
-                )))
     (run-prolog goal fb)))
 
 (defun test8 ()
@@ -1655,6 +1636,7 @@
                 (:get-yint (:? y))
                 (:lisp (< (:? x) (:? y)))
                 (:lisp (out "_ succeeded"))
+                (:trace-off)
                 )))
     (run-prolog goal fb)))
 
@@ -1669,13 +1651,45 @@
 	      ((:rname 2 :two2))
 	      ((:rname 2 :two3))
 	      
-	      ((:main (:? x) (:? y)) (:rect (:? x)) (:sub (:? x) (:? y)))
+	      ((:main (:? x) (:? y))
+               (:rect (:? x))
+               (:sub (:? x) (:? y)))
 	      
-	      ((:sub (:? x) (:? y)) (:rname (:? x) (:? y)) (:sub2 (:? y)))
+	      ((:sub (:? x) (:? y))
+               (:rname (:? x) (:? y))
+               (:sub2 (:? y)))
 	      
-	      ((:sub2 (:? y)))
+	      ((:sub2 (:? y)) (:lisp (out (:? y))))
 
-	      )))
+	      ))
+
+        (fb-doesnt-work '(
+	      ((:rect 1))
+	      ((:rect 2))
+	      ((:rname 1 :one))
+	      ((:rname 1 :one2))
+	      ((:rname 1 :one3))
+	      ((:rname 2 :two))
+	      ((:rname 2 :two2))
+	      ((:rname 2 :two3))
+	      
+	      ((:main (:? x) (:? y))
+               (:rect (:? x))
+               (:sub (:? x) (:? y))
+               :!
+               :fail)
+              ((:main (:? x) (:? y)))
+	      
+	      ((:sub (:? x) (:? y))
+               (:rname (:? x) (:? y))
+               (:sub2 (:? y))
+               :!
+               :fail)
+              ((:sub (:? x) (:? y))
+	      
+	      ((:sub2 (:? y)) (:lisp (out (:? y))))
+
+	      ))))
     (let ((goal '((:main (:? x) (:? y)))))
       (run-prolog goal fb))))
 
@@ -1728,5 +1742,5 @@
   (lisp-test7)
   (format *standard-output* "~&test8 trace 3 & :lisp~%~%")
   (test8)
-  (format *standard-output* "~&test9~%")
+  (format *standard-output* "~%~%test9~%")
   (test9))
