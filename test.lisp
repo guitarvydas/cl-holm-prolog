@@ -1476,7 +1476,7 @@
         (goal '( (:Gt-ints (:? x) (:? y)) (< (:? y) (:? x)) )))
     (run-prolog goal fb)))
 
-(defun compare (self v n)
+(defun compare (v n)
   (declare (ignore self))
   (>= v n))
 
@@ -1658,6 +1658,27 @@
                 )))
     (run-prolog goal fb)))
 
+(defun test9 ()
+  (let ((fb '(
+	      ((:rect 1))
+	      ((:rect 2))
+	      ((:rname 1 :one))
+	      ((:rname 1 :one2))
+	      ((:rname 1 :one3))
+	      ((:rname 2 :two))
+	      ((:rname 2 :two2))
+	      ((:rname 2 :two3))
+	      
+	      ((:main (:? x) (:? y)) (:rect (:? x)) (:sub (:? x) (:? y)))
+	      
+	      ((:sub (:? x) (:? y)) (:rname (:? x) (:? y)) (:sub2 (:? y)))
+	      
+	      ((:sub2 (:? y)))
+
+	      )))
+    (let ((goal '((:main (:? x) (:? y)))))
+      (run-prolog goal fb))))
+
 (defun cl-user::htest ()
   (format *standard-output* "~&htest~%~%")
   (htest)
@@ -1706,4 +1727,6 @@
   (format *standard-output* "~&lisp test7 tracing & :lisp~%~%")
   (lisp-test7)
   (format *standard-output* "~&test8 trace 3 & :lisp~%~%")
-  (test8))
+  (test8)
+  (format *standard-output* "~&test9~%")
+  (test9))
