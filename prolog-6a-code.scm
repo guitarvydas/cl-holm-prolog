@@ -266,6 +266,8 @@
  ((rname 2 two3 branch3))
 
  ((main (? x) (? y) (? branch)) (rect (? x)) (sub (? x) (? y) (? branch)))
+ ((main (? x) (? y) (? branch)) (rect (? x)) (sub (? x) (? y) branch2 !))
+ ((main (? x) (? y) (? branch)) (rect (? x)) (sub (? x) (? y) (? branch)))
 
  ((sub (? x) (? y) (? branch)) (rname (? x) (? y) (? branch)) (sub2 (? y)))
 
