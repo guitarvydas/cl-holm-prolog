@@ -1693,6 +1693,32 @@
     (let ((goal '((:main (:? x) (:? y)))))
       (run-prolog goal fb))))
 
+(defun test10 ()
+  (let ((fb '(
+	      ((:rect 1))
+	      ((:rect 2))
+	      ((:rname 1 :one  :branch1))
+	      ((:rname 1 :one2 :branch2))
+	      ((:rname 1 :one3 :branch3))
+	      ((:rname 2 :two  :branch1))
+	      ((:rname 2 :two2 :branch2))
+	      ((:rname 2 :two3 :branch3))
+	      
+	      ((:main (:? x) (:? y) (:? b))
+               (:rect (:? x))
+               (:sub (:? x) (:? y) (:? b)))
+	      
+	      ((:sub (:? x) (:? y) (:? b))
+               (:rname (:? x) (:? y) (:? b))
+               (:sub2 (:? y)))
+	      
+	      ((:sub2 (:? y)) (:lisp (out (:? y))))
+
+	      ))
+        )
+    (let ((goal '((:main (:? x) (:? y)))))
+      (run-prolog goal fb))))
+
 (defun cl-user::htest ()
   (format *standard-output* "~&htest~%~%")
   (htest)
@@ -1743,4 +1769,6 @@
   (format *standard-output* "~&test8 trace 3 & :lisp~%~%")
   (test8)
   (format *standard-output* "~%~%test9~%")
-  (test9))
+  (test9)
+  (format *standard-output* "~%~%test10~%")
+  (test10))

@@ -254,3 +254,25 @@
 (define goals '((main (? x) (? y))))
 
 (prove6 '() goals db empty 1 '())
+
+(define db
+  '( ((rect 1))
+ ((rect 2))
+ ((rname 1 one  branch1))
+ ((rname 1 one2 branch2))
+ ((rname 1 one3 branch3))
+ ((rname 2 two  branch1))
+ ((rname 2 two2 branch2))
+ ((rname 2 two3 branch3))
+
+ ((main (? x) (? y) (? branch)) (rect (? x)) (sub (? x) (? y) (? branch)))
+
+ ((sub (? x) (? y) (? branch)) (rname (? x) (? y) (? branch)) (sub2 (? y)))
+
+ ((sub2 (? y)))
+ ))
+
+(define goals '((main (? x) (? y) (? branch))))
+
+(prove6 '() goals db empty 1 '())
+
