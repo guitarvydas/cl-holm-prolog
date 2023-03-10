@@ -18,3 +18,23 @@ A factbase is a list of rules + facts:
  	(body (:? a))
 	(body (:? b)))
 ((fact x y)))
+
+---
+Patterns in facts:
+
+()
+:!			PROLOG Cut
+:r!				       <internal - ignore>
+:rule				       <obsolete - ignore>
+:fact				       <obsolete - ignore>
+:lispv			(:lispv (:? xx) (fn arg arg ...)) ... ) xx is bound to result of call (fn self arg arg ...), unless xx is _
+:lisp
+:lisp-true-fail
+:lisp-method
+"NOT" ">=" "<=" ">" "<"
+TRUE
+FAIL
+:trace-on
+:trace-off
+() () -> backtrack
+

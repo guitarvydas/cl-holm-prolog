@@ -1,5 +1,7 @@
 (in-package :cl-holm-prolog)
 
+(defparameter *?* :?)
+
 (defparameter *trace* nil)
 
 (defconstant +true+ t)
@@ -13,7 +15,6 @@
 (defun newline () (format *standard-output* "~%"))
 
 (defun display (x) (format *standard-output* "~A" x))
-
 
 #|
 (defmacro link (&rest x) `(list ,@x))
@@ -58,7 +59,7 @@
   (mapcar #'(lambda (y)
               (if (and (listp y) (member (car y) '(asserta retract)))
                   (mapcar #'(lambda (x)
-                              (if (and (listp x) (eq :? (car x)))
+                              (if (and (listp x) (eq *?* (car x)))
                                   (resolve x e)
                                 x))
                           y)
@@ -71,7 +72,7 @@
 ;; a rule is ((a) (b) (c)) where (a) is the head, ((b) (c)) is the body of the rule
 ;; a fact is ((fact))
 ;; a goal is ( (e) ...) where (e) is a single relation to be matched
-;; a logic variable is (:? var) 
+;; a logic variable is (? var) 
 (defun prove-helper (l g r e n c depth complete-db result self)
   (cond
    ((null? g)
@@ -96,7 +97,7 @@
 
    ((and (listp (car g))
          (eq :lispv (caar g)))
-    (let ((lispv-clause (first g))) ; (:lispv (:? xx) (fn arg arg ...)) ... ) xx is bound to result of call (fn self arg arg ...), unless xx is _
+    (let ((lispv-clause (first g))) ; (:lispv (? xx) (fn arg arg ...)) ... ) xx is bound to result of call (fn self arg arg ...), unless xx is _
       (assert (= 3 (length lispv-clause))) ;; the :lispv form is badly formed if this assert fails
       (let ((var-clause (second lispv-clause))
             (sexpr (third lispv-clause)))
@@ -247,7 +248,7 @@
 
 (defun var? (x)
   (and (pair? x)
-       (eq? :? (car x))))
+       (eq? *?* (car x))))
 
 (defun lookup (v orig-e)
   (let ((id (name v))
@@ -285,14 +286,14 @@
 (defun unify (x y e)
   ;; return (values bindings success)
 
-  (unless (eq x t)
+  #+nil (unless (eq x t)
     (when (and x
                (symbolp x)
                (not (eq x *empty*))
                (not (eq (find-package "KEYWORD") (symbol-package x))))
       (error (format nil "goals must use KEYWORD symbols, but got ~S" x))))
     
-  (unless (eq y t)
+  #+nil(unless (eq y t)
     (when (and y
                (symbolp y)
                (not (eq y *empty*))
