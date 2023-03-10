@@ -3,4 +3,5 @@
   (:use :cl)
   (:export
    #:prove
+   #:reify
    #:*empty*))

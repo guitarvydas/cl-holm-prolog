@@ -380,3 +380,19 @@
 (defun dec-depth (n)
   ;; might use (min 0 (1- n)) in the future, after debugging
   (1- n))
+
+
+;; replace variables in lis with actual values given by alis
+(defun reify (lis alis)
+  (cond ((null lis) nil)
+        ((not (listp lis)) lis)
+        ((listp lis)
+         (let ((looks-like-a-var (and (= 2 (length lis)) (eq ':? (first lis)))))
+           (cond (looks-like-a-var
+                  (let ((sym (second lis)))         
+                    (let ((vl (assoc sym alis)))
+                      (cond (vl (cdr vl))
+                            ((null vl) lis)))))
+                 ((not looks-like-a-var)
+                  (cons (reify (car lis) alis)
+                         (reify (cdr lis) alis))))))))
