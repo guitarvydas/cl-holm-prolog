@@ -1102,7 +1102,7 @@
         (top-cut nil)
         (top-results-accum nil)
         (top-success :no))
-    (prove top-link '((:mortal :nils)) initial-db top-env 1 top-cut complete-db nil *self*)))
+    (prove top-link '((:mortal :nils)) initial-db top-env 1 top-cut complete-db nil *self*))) ;; should -> nil
 
 (defun cl-user::htest3 ()
   (let ((complete-db db-very-small2)
@@ -1110,7 +1110,7 @@
         (top-link nil)
         (top-env *empty*)
         (top-cut nil))
-    (prove top-link '((:mortal (:? cl-user::m))) initial-db top-env 1 top-cut complete-db nil *self*)))
+    (prove top-link '((:mortal (:? cl-user::m))) initial-db top-env 1 top-cut complete-db nil *self*))) ;; -> nil
 
 
 
